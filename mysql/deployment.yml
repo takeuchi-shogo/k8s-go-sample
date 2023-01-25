@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # creationTimestamp: ""
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy: {}
+  template:
+    metadata:
+      # creationTimestamp: {}
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: mysql:8.0
+          name: mysql
+          resources: {}
+            # requests:
+            #   memory: "64Mi"
+            #   cpu: "250m"
+            # limits:
+            #   memory: "128Mi"
+            #   cpu: "500m"
+          env:
+              # Use secret in real usage
+            - name: MYSQL_ROOT_PASSWORD
+              value: password
+            # - name: MYSQL_ROOT_PASSWORD
+            #   value: pass
+            # - name: MYSQL_DATABASE
+            #   value: luka_test
+            # - name: MYSQL_USER
+            #   value: user
+            # - name: MYSQL_PASSWORD
+            #   value: pass
+status: {}
