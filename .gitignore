@@ -1,0 +1,5 @@
+
+/app/main
+/app/app.env
+
+/app/k8s/.env

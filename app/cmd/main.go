@@ -1,12 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/takeuchi-shogo/k8s-go-sample/config"
 )
 
 func main() {
+
+	config := config.NewConfig(".")
+	fmt.Println(config)
 
 	r := gin.Default()
 

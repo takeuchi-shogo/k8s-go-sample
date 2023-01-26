@@ -33,10 +33,10 @@ spec:
               value: password
             # - name: MYSQL_ROOT_PASSWORD
             #   value: pass
-            # - name: MYSQL_DATABASE
-            #   value: luka_test
+            - name: MYSQL_DATABASE
+              value: luka_test
             # - name: MYSQL_USER
-            #   value: user
+            #   value: luka_adminer
             # - name: MYSQL_PASSWORD
             #   value: pass
 status: {}
