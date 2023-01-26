@@ -32,11 +32,11 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               value: password
             # - name: MYSQL_ROOT_PASSWORD
-            #   value: pass
+            #   value: 
             - name: MYSQL_DATABASE
               value: luka_test
             # - name: MYSQL_USER
-            #   value: luka_adminer
+            #   value: 
             # - name: MYSQL_PASSWORD
-            #   value: pass
+            #   value: 
 status: {}
