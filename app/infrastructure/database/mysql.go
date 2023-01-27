@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/takeuchi-shogo/k8s-go-sample/config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -13,13 +14,13 @@ type DB struct {
 	Connection *gorm.DB
 }
 
-func NewDB() *DB {
+func NewDB(c *config.Config) *DB {
 	return &DB{
 		Connection: connection(
-			"3306",      // host
-			"root",      // user name
-			"password",  // password
-			"luka_test", // database name
+			c.DBHost,     // host
+			c.DBUsername, // user name
+			c.DBPassword, // password
+			c.DBName,     // database name
 		),
 	}
 }

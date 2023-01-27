@@ -19,7 +19,7 @@ func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultSt
 	if err != nil {
 		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
 	}
-	return user, services.NewResultStatus(http.StatusOK, nil)
+	return interactor.UserPresenter.ResponseUser(user), services.NewResultStatus(http.StatusOK, nil)
 }
 
 func (interactor *UserInteractor) Create(u *models.Users) (*models.Users, *services.ResultStatus) {

@@ -6,7 +6,7 @@ type ResponseSuccess struct {
 	Message string      `json:"message"`
 }
 
-func NewResponseSuccess(data interface{}, message string) *ResponseSuccess {
+func NewResponseSuccess(message string, data interface{}) *ResponseSuccess {
 	return &ResponseSuccess{
 		Status:  true,
 		Data:    data,

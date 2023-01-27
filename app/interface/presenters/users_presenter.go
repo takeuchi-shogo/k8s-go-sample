@@ -1,7 +1,7 @@
 package presenters
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/presenter"
@@ -15,6 +15,7 @@ func NewUsersPresenter() presenter.UserPresenter {
 }
 
 func (presenter *UsersPresenter) ResponseUser(user *models.Users) *models.Users {
-	fmt.Println(user)
+	user.Name = "Mr." + user.Name
+	log.Println(user)
 	return user
 }

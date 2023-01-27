@@ -1,7 +1,8 @@
 package controllers
 
 import (
-	"log"
+	"net/http"
+	"strconv"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
@@ -29,7 +30,18 @@ func NewUsersController(db repositories.DB) *usersController {
 }
 
 func (controller *usersController) Get(c helpers.Context) {
-	log.Println("get user")
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, helpers.NewResponseError(http.StatusBadRequest, err, err.Error()))
+		return
+	}
+
+	user, res := controller.Interactor.Get(id)
+	if res.Error != nil {
+		c.JSON(res.Code, helpers.NewResponseError(res.Code, res.Error, res.Error.Error()))
+		return
+	}
+	c.JSON(res.Code, helpers.NewResponseSuccess("success", user))
 }
 
 func (controller *usersController) Post(c helpers.Context) {
@@ -37,6 +49,7 @@ func (controller *usersController) Post(c helpers.Context) {
 	user, res := controller.Interactor.Create(u)
 	if res.Error != nil {
 		c.JSON(res.Code, helpers.NewResponseError(res.Code, res.Error, res.Error.Error()))
+		return
 	}
-	c.JSON(res.Code, helpers.NewResponseSuccess(user, "success"))
+	c.JSON(res.Code, helpers.NewResponseSuccess("success", user))
 }

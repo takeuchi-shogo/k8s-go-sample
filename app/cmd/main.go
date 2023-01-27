@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/takeuchi-shogo/k8s-go-sample/config"
 	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/database"
 	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/routes"
@@ -12,8 +10,8 @@ import (
 func main() {
 
 	config := config.NewConfig(".")
-	fmt.Println(config)
-	db := database.NewDB()
+	// fmt.Println(config)
+	db := database.NewDB(config)
 	routes := routes.NewRoutes(db)
 	server := server.NewServer(routes)
 
