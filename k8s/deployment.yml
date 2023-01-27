@@ -12,8 +12,10 @@ spec:
         app: sample-app
     spec:
       containers:
-      - name: sample-app
-        image: k8s-sample-go:latest
+      - image: k8s-sample-go:minikube
+        # imagePullPolicy: Never
+        name: sample-app
+        # タグ指定するとDocker hubから持ってこようとする
         envFrom:
           - configMapRef:
               name: sample-app
@@ -23,5 +25,5 @@ spec:
           # limits:
           #   memory: "128Mi"
           #   cpu: "500m"
-        # ports:
-        # - containerPort: <Port>
+        ports:
+        - containerPort: 8080

@@ -2,4 +2,4 @@
 /app/main
 /app/app.env
 
-/app/k8s/.env
+/k8s/.env

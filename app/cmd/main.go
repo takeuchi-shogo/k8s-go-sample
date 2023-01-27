@@ -2,24 +2,20 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/takeuchi-shogo/k8s-go-sample/config"
+	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/database"
+	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/routes"
+	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/server"
 )
 
 func main() {
 
 	config := config.NewConfig(".")
 	fmt.Println(config)
+	db := database.NewDB()
+	routes := routes.NewRoutes(db)
+	server := server.NewServer(routes)
 
-	r := gin.Default()
-
-	r.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Hellow world!!",
-		})
-	})
-
-	r.Run(":8080")
+	server.Run(":" + config.ServerPort)
 }
