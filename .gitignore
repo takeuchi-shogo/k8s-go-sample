@@ -3,3 +3,7 @@
 /app/app.env
 
 /k8s/.env
+
+/mysql/data
+
+*.env

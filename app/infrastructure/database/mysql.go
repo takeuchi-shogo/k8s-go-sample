@@ -26,6 +26,7 @@ func NewDB(c *config.Config) *DB {
 }
 
 func connection(host, username, password, dbName string) *gorm.DB {
+	fmt.Println(username, password, host, dbName)
 	count := 0
 	conn, err := gorm.Open(mysql.Open(fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local", username, password, host, dbName)), &gorm.Config{})
 	if err != nil {
@@ -37,7 +38,7 @@ func connection(host, username, password, dbName string) *gorm.DB {
 			time.Sleep(time.Second)
 			count++
 			// connection wait 10 seconds for database starting...
-			if count > 10 {
+			if count > 12 {
 				fmt.Print("database connection failed\n")
 				panic(err.Error())
 			}

@@ -9,8 +9,8 @@ import (
 
 func main() {
 
+	// k8s.LeadConfigMap()
 	config := config.NewConfig(".")
-	// fmt.Println(config)
 	db := database.NewDB(config)
 	routes := routes.NewRoutes(db)
 	server := server.NewServer(routes)

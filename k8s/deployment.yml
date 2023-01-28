@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: sample-app
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: sample-app
@@ -12,8 +13,8 @@ spec:
         app: sample-app
     spec:
       containers:
-      - image: k8s-sample-go:minikube
-        # imagePullPolicy: Never
+      - image: k8s-sample-go:latest
+        imagePullPolicy: IfNotPresent
         name: sample-app
         # タグ指定するとDocker hubから持ってこようとする
         envFrom:
@@ -22,8 +23,13 @@ spec:
           - secretRef:
               name: sample-app
         resources: {}
-          # limits:
-          #   memory: "128Mi"
-          #   cpu: "500m"
+        #   requests:
+        #     cpu: 1
+        #     memory: 4Mi
+        # limits:
+        #   memory: "128Mi"
+        #   cpu: "500m"
         ports:
         - containerPort: 8080
+        # 10.96.0.10:53
+        # failed to initialize database, got error dial tcp: lookup mysql on 10.96.0.10:53: no such host

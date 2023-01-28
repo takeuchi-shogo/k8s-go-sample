@@ -3,16 +3,16 @@ kind: Service
 metadata:
   # creationTimestamp: null
   labels:
-    app: mysql
-  name: mysql
+    app: sample-app
+  name: sample-app
 spec:
   ports:
-  - name: "mysql"
-    port: 3306
+  - name: "80"
+    port: 80
     protocol: TCP
-    targetPort: 3306
+    targetPort: 8080
   selector:
-    app: mysql
+    app: sample-app
   type: ClusterIP
 status:
   loadBalancer: {}

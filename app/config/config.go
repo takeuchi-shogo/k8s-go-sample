@@ -20,7 +20,7 @@ type Config struct {
 func NewConfig(path string) *Config {
 
 	viper.SetConfigFile(path)
-	viper.SetConfigFile("app.env")
+	viper.SetConfigFile("development.env")
 	// viper.SetConfigName("app")
 	// viper.SetConfigType("env")
 
@@ -31,6 +31,12 @@ func NewConfig(path string) *Config {
 	c := &Config{}
 	if err := viper.Unmarshal(&c); err != nil {
 		log.Fatal("env file unmarshal: ", err)
+	}
+
+	if c.Environment == "devlopment" {
+		log.Print("\n==================================================\n")
+		log.Print("\n\nCurrently, it's a development environment!!!!!!\n\n")
+		log.Print("\n==================================================\n")
 	}
 
 	return c

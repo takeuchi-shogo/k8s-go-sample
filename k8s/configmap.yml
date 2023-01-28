@@ -1,9 +1,9 @@
 apiVersion: v1
 data:
-  MYSQL_DATABASE: luka_test
+  DB_DATABASE: sample_app
   # サービス名、ネームスペース、リソース、同じクラスター内という記述
-  MYSQL_HOST: mysql.database.svc.cluster.local
-  MYSQL_USER: root
+  DB_HOST: mysql.database.svc.cluster.local
+  DB_USER: root
 kind: ConfigMap
 metadata:
   # creationTimestamp: null
