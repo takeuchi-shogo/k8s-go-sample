@@ -2,6 +2,7 @@ package config
 
 import (
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -37,6 +38,11 @@ func NewConfig(path string) *Config {
 		log.Print("\n==================================================\n")
 		log.Print("\n\nCurrently, it's a development environment!!!!!!\n\n")
 		log.Print("\n==================================================\n")
+	}
+	// kubernetes環境の時は下記を反映したい
+	// 他にもいい書き方はあるはず
+	if os.Getenv("ENV") == "kubernetes" {
+		c.DBHost = os.Getenv("DB_HOST")
 	}
 
 	return c
