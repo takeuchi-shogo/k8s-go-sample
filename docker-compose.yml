@@ -36,8 +36,6 @@ services:
       # MYSQL_USER: '${DB_USER}'
       # MYSQL_PASSWORD: '${DB_PASS}'
       # MYSQL_DATABASE: '${DB_NAME}'
-      # MYSQL_USER: root
-      # MYSQL_PASSWORD: password
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     networks:
       - k8s-sample-go-network
