@@ -12,7 +12,7 @@ func main() {
 	// k8s.LeadConfigMap()
 	config := config.NewConfig(".")
 	db := database.NewDB(config)
-	routes := routes.NewRoutes(db)
+	routes := routes.NewRoutes(config, db)
 	server := server.NewServer(routes)
 
 	server.Run(":" + config.ServerPort)

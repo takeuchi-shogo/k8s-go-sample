@@ -16,6 +16,10 @@ type Config struct {
 	DBHost     string `mapstructure:"DB_HOST"`
 	DBPort     string `mapstructure:"DB_PORT"`
 	DBName     string `mapstructure:"DB_NAME"`
+
+	Cors struct {
+		AllowOringins []string
+	}
 }
 
 func NewConfig(path string) *Config {
@@ -44,6 +48,8 @@ func NewConfig(path string) *Config {
 	if os.Getenv("ENV") == "kubernetes" {
 		c.DBHost = os.Getenv("DB_HOST")
 	}
+
+	c.Cors.AllowOringins = []string{"http://localhost:3000"}
 
 	return c
 }
