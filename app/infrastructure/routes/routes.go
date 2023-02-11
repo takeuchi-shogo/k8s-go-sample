@@ -37,6 +37,10 @@ func (r *Routes) setCors(cors *middleware.Cors) {
 
 func (r *Routes) setRouting() {
 
+	accountsController := controllers.NewAccountsController(r.DB)
+	blocksController := controllers.NewBlocksController(r.DB)
+	reportsController := controllers.NewReportsController(r.DB)
+	userProfilesController := controllers.NewUserProfilesController(r.DB)
 	usersController := controllers.NewUsersController(r.DB)
 
 	// srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
@@ -51,8 +55,25 @@ func (r *Routes) setRouting() {
 
 	v1 := r.Gin.Group("/v1")
 
-	v1.POST("/users", func(c *gin.Context) { usersController.Post(c) })
-	v1.GET("/users/:id", func(c *gin.Context) { usersController.Get(c) })
+	// accounts
+	v1.GET("/accounts", func(ctx *gin.Context) { accountsController.Get(ctx) })
+	v1.POST("/accounts", func(ctx *gin.Context) { accountsController.Post(ctx) })
+
+	// blocks
+	v1.GET("/blocks/:id", func(ctx *gin.Context) { blocksController.Get(ctx) })
+	v1.POST("/blocks", func(ctx *gin.Context) { blocksController.Post(ctx) })
+
+	// reports
+	v1.GET("/reports/:id", func(ctx *gin.Context) { reportsController.Get(ctx) })
+	v1.POST("/reports", func(ctx *gin.Context) { reportsController.Post(ctx) })
+
+	// userProfiles
+	v1.GET("/userProfiles/:id", func(ctx *gin.Context) { userProfilesController.Get(ctx) })
+	v1.POST("/userProfiles", func(ctx *gin.Context) { userProfilesController.Post(ctx) })
+
+	// users
+	v1.POST("/users", func(ctx *gin.Context) { usersController.Post(ctx) })
+	v1.GET("/users/:id", func(ctx *gin.Context) { usersController.Get(ctx) })
 }
 
 // Defining the Graphql handler
@@ -70,7 +91,7 @@ func graphqlHandler() gin.HandlerFunc {
 }
 
 func playGround() gin.HandlerFunc {
-	h := playground.Handler("GraphQL", "/graphql/query")
+	h := playground.Handler("GraphQL", "/query")
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}

@@ -10,12 +10,15 @@ import (
 )
 
 type UserInteractor struct {
+	DBRepository   repository.DBRepository
 	UserRepository repository.UserRepository
 	UserPresenter  presenter.UserPresenter
 }
 
 func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultStatus) {
-	user, err := interactor.UserRepository.FindByID(id)
+	db := interactor.DBRepository.Connect()
+
+	user, err := interactor.UserRepository.FindByID(db, id)
 	if err != nil {
 		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
 	}

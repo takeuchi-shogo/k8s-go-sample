@@ -8,4 +8,6 @@ import "github.com/takeuchi-shogo/k8s-go-sample/graph/model"
 
 type Resolver struct {
 	todos []*model.Todo
+	users []*model.User
+	user  *model.User
 }

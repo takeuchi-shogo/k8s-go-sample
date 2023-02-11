@@ -13,8 +13,13 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+func RandomInt(maxInt int) int {
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(maxInt)
+}
+
 // RandomInt generates a random integer between min and max
-func RandomInt(min, max int64) int64 {
+func RandomInt64(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
 }
 

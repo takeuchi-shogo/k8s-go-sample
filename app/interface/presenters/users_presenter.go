@@ -15,7 +15,7 @@ func NewUsersPresenter() presenter.UserPresenter {
 }
 
 func (presenter *UsersPresenter) ResponseUser(user *models.Users) *models.Users {
-	user.Name = "Mr." + user.Name
+	user.DisplayName = "Mr." + user.DisplayName
 	log.Println(user)
 	return user
 }

@@ -11,6 +11,7 @@ import (
 	"math/big"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/graph/model"
+	"github.com/takeuchi-shogo/k8s-go-sample/utils"
 )
 
 // CreateTodo is the resolver for the createTodo field.
@@ -25,17 +26,55 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return todo, nil
 }
 
+// CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	panic(fmt.Errorf("not implemented: CreateUsers - createUsers"))
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
+// Users is the resolver for the users field.
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	for i := 0; i < 5; i++ {
+		pass, _ := utils.GenerateFromPassword("pass")
+		user := &model.User{
+			ID:       utils.RandomString(10),
+			Name:     utils.RandomOwner(),
+			Password: pass,
+		}
+		r.users = append(r.users, user)
+	}
+
+	return r.users, nil
 }
 
-func (r *queryResolver) Users(ctx context.Context) ([]model.User, error) {
-	panic(fmt.Errorf("not implemented: Users - Users"))
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	pass, _ := utils.GenerateFromPassword("pass")
+	r.user = &model.User{
+		ID:       id,
+		Name:     "test" + id,
+		Password: pass,
+	}
+	return r.user, nil
+}
+
+// Todos is the resolver for the todos field.
+func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	for i := 0; i < 5; i++ {
+		text := utils.RandomString(50)
+		v := utils.RandomInt(100)
+		done := false
+		if v%2 == 0 {
+			done = true
+		}
+		todo := &model.Todo{
+			ID:   utils.RandomString(15),
+			Text: text,
+			Done: done,
+		}
+		r.todos = append(r.todos, todo)
+	}
+
+	return r.todos, nil
 }
 
 // Mutation returns MutationResolver implementation.

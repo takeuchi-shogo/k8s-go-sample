@@ -23,6 +23,7 @@ type UserController interface {
 func NewUsersController(db repositories.DB) *usersController {
 	return &usersController{
 		Interactor: interactor.UserInteractor{
+			DBRepository:   &repositories.DBRepository{DB: db},
 			UserRepository: &repositories.UserRepository{},
 			UserPresenter:  &presenters.UsersPresenter{},
 		},

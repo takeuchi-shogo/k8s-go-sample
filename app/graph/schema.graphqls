@@ -16,7 +16,8 @@ type User {
 }
 
 type Query {
-  user: [User!]!
+  users: [User!]!
+  user(id: ID!): User!
   todos: [Todo!]!
 }
 

@@ -8,6 +8,8 @@ import (
 )
 
 type Config struct {
+	ApplicationName string
+
 	ServerPort  string `mapstructure:"SERVER_PORT"`
 	Environment string `mapstructure:"ENV"`
 	// database
@@ -19,6 +21,11 @@ type Config struct {
 
 	Cors struct {
 		AllowOringins []string
+	}
+
+	Jwt struct {
+		TokenExpireAt int
+		SecretKey     string
 	}
 }
 
@@ -48,6 +55,8 @@ func NewConfig(path string) *Config {
 	if os.Getenv("ENV") == "kubernetes" {
 		c.DBHost = os.Getenv("DB_HOST")
 	}
+
+	c.ApplicationName = "sample-app"
 
 	c.Cors.AllowOringins = []string{"http://localhost:3000"}
 
