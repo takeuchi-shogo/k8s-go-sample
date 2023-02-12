@@ -7,7 +7,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-gonic/gin"
 	"github.com/takeuchi-shogo/k8s-go-sample/config"
-	"github.com/takeuchi-shogo/k8s-go-sample/graph"
+	"github.com/takeuchi-shogo/k8s-go-sample/graphql"
 	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/database"
 	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/middleware"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/controllers"
@@ -79,7 +79,7 @@ func (r *Routes) setRouting() {
 
 // Defining the Graphql handler
 func graphqlHandler() gin.HandlerFunc {
-	h := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	h := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}}))
 
 	// Post only
 	//

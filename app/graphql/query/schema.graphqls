@@ -1,0 +1,114 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+# ========== type ==========
+type Accounts {
+  id: ID!
+  phone_number: String!
+  email: String!
+  password: String!
+  login_status: Boolean!
+  access_level: String!
+}
+
+type Blocks {
+  id: ID!
+  blocking: Int!
+  blocked: Int!
+}
+
+type Matches {
+  id: ID!
+  male_user_id: Int!
+  female_user_id: Int!
+}
+
+type Reports {
+  id: ID!
+  reporter_id: Int!
+  reported_id: Int!
+  reason: String!
+}
+
+type UserProfiles {
+  id: ID!
+  user_id: Int!
+  description: String!
+  interests: String!
+  looking_for: String!
+}
+
+# type Todo {
+#   id: ID!
+#   text: String!
+#   done: Boolean!
+#   user: User!
+# }
+
+type Users {
+  id: ID!
+  account_id: Int!
+  display_name: String!
+  sceen_name: String!
+  gender: String!
+  location: String!
+  is_authorize_email: Boolean!
+  is_verified_email: Boolean!
+  is_verified_age: Boolean!
+}
+
+# ========== query ==========
+type Query {
+  account(id: ID!): Accounts!
+
+  blocks: [Blocks!]!
+  block(id: ID!): Blocks!
+
+  reports: [Reports!]!
+  report(id: ID!): Reports!
+
+  users: [Users!]!
+  user(id: ID!): Users!
+  # todos: [Todo!]!
+}
+
+# ========== input ==========
+input NewAccounts {
+  phone_number: String!
+  email: String!
+  password: String!
+}
+
+input NewBlocks {
+  blocking: Int!
+  blocked: Int!
+}
+
+input NewReports {
+  reporter_id: Int!
+  reported_id: Int!
+  reason: String!
+}
+
+# input NewTodo {
+#   text: String!
+#   userId: String!
+# }
+
+input NewUsers {
+  account_id: Int!
+  display_name: String!
+  sceen_name: String!
+  gender: String!
+}
+
+# ========== mutation ==========
+type Mutation {
+  createAccount(input: NewAccounts): Accounts!
+  createBlock(input: NewBlocks): Blocks!
+  createReport(input: NewReports): Reports!
+  # createUserProfile(input: ):
+  # createTodo(input: NewTodo!): Todo!
+  createUser(input: NewUsers!): Users!
+}

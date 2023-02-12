@@ -1,27 +1,27 @@
-# Where are all the schema files located? globs are supported eg  src/**/*.graphqls
+# Where are all the schema files located? globs are supported eg  src/**/*.graphqlqls
 schema:
-  - graph/*.graphqls
+  - graphql/query/*.graphqls
 
 # Where should the generated server code go?
 exec:
-  filename: graph/generated.go
-  package: graph
+  filename: graphql/generated.go
+  package: graphql
 
 # Uncomment to enable federation
 # federation:
-#   filename: graph/federation.go
-#   package: graph
+#   filename: graphql/federation.go
+#   package: graphql
 
 # Where should any generated models go?
 model:
-  filename: graph/model/models_gen.go
-  package: model
+  filename: graphql/types/models_gen.go
+  package: types
 
 # Where should the resolver implementations go?
 resolver:
   layout: follow-schema
-  dir: graph
-  package: graph
+  dir: graphql
+  package: graphql
 
 # Optional: turn on use ` + "`" + `gqlgen:"fieldName"` + "`" + ` tags in your models
 # struct_tag: json
@@ -42,17 +42,29 @@ resolver:
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-#  - "github.com/takeuchi-shogo/k8s-go-sample/graph/model"
+#  - "github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 
-# This section declares type mapping between the GraphQL and go type systems
+# This section declares type mapping between the graphqlQL and go type systems
 #
 # The first line in each type will be used as defaults for resolver arguments and
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
 models:
-  # Users:
-  #   models:
-  #     - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.users"
+  Accounts:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Accounts"
+  Blocks:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Blocks"
+  Reports:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Reports"
+  UserProfiles:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.UserProfiles"
+  Users:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Users"
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID
