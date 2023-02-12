@@ -20,3 +20,10 @@ func (repo *UserRepository) Create(db *gorm.DB, u *models.Users) (*models.Users,
 	}
 	return u, nil
 }
+
+func (repo *UserRepository) Save(db *gorm.DB, u *models.Users) (*models.Users, error) {
+	if err := db.Save(u).Error; !errors.Is(err, nil) {
+		return nil, fmt.Errorf("failed user save: %w", err)
+	}
+	return u, nil
+}

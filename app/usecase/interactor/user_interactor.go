@@ -10,9 +10,11 @@ import (
 )
 
 type UserInteractor struct {
-	DBRepository   repository.DBRepository
-	UserRepository repository.UserRepository
-	UserPresenter  presenter.UserPresenter
+	AccountRepository     repository.AccountRepository
+	DBRepository          repository.DBRepository
+	UserRepository        repository.UserRepository
+	UserPresenter         presenter.UserPresenter
+	VerifyEmailRepository repository.VerifyEmailRepository
 }
 
 func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultStatus) {
@@ -25,7 +27,37 @@ func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultSt
 	return interactor.UserPresenter.ResponseUser(user), services.NewResultStatus(http.StatusOK, nil)
 }
 
-func (interactor *UserInteractor) Create(u *models.Users) (*models.Users, *services.ResultStatus) {
+func (interactor *UserInteractor) Create(u *models.Users, accountID int, code string) (*models.Users, *services.ResultStatus) {
 	// repository prosess
-	return u, services.NewResultStatus(http.StatusOK, nil)
+	db := interactor.DBRepository.Connect()
+
+	account, err := interactor.AccountRepository.FindByID(db, accountID)
+	if err != nil {
+		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
+	}
+
+	u.AccountID = account.ID
+
+	if _, err := interactor.VerifyEmailRepository.FirstByCode(db, code); err == nil {
+		u.IsAuthorizeEmail = true
+	}
+
+	user, err := interactor.UserRepository.Create(db, u)
+	if err != nil {
+		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
+	}
+
+	return user, services.NewResultStatus(http.StatusOK, nil)
+}
+
+func (interactor *UserInteractor) Save(u *models.Users) (*models.Users, *services.ResultStatus) {
+
+	db := interactor.DBRepository.Connect()
+
+	user, err := interactor.UserRepository.Save(db, u)
+	if err != nil {
+		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
+	}
+
+	return user, services.NewResultStatus(http.StatusOK, nil)
 }

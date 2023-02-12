@@ -16,23 +16,24 @@ type AuthorizeInteractor struct {
 	UserRepository repository.UserRepository
 }
 
-func (interactor *AuthorizeInteractor) Verify(token string) (*models.Users, services.ResultStatus) {
+func (interactor *AuthorizeInteractor) Verify(token string) (*models.Users, *services.ResultStatus) {
 	claims, err := interactor.Jwt.ParseToken(token)
 	if err != nil {
-		return &models.Users{}, *services.NewResultStatus(http.StatusUnauthorized, err)
+		return &models.Users{}, services.NewResultStatus(http.StatusUnauthorized, err)
 	}
+
 	// check token
 	if isTokenExpire(int64(claims["exp"].(float64))) {
-		return &models.Users{}, *services.NewResultStatus(http.StatusUnauthorized, err)
+		return &models.Users{}, services.NewResultStatus(http.StatusUnauthorized, err)
 	}
 
 	db := interactor.DBRepository.Connect()
 
 	foundUser, err := interactor.UserRepository.FindByID(db, claims["aud"].(int))
 	if err != nil {
-		return &models.Users{}, *services.NewResultStatus(http.StatusUnauthorized, err)
+		return &models.Users{}, services.NewResultStatus(http.StatusUnauthorized, err)
 	}
-	return foundUser, *services.NewResultStatus(http.StatusOK, nil)
+	return foundUser, services.NewResultStatus(http.StatusOK, nil)
 }
 
 func isTokenExpire(expireAt int64) bool {

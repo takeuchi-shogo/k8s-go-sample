@@ -8,4 +8,5 @@ import (
 type UserRepository interface {
 	FindByID(db *gorm.DB, id int) (*models.Users, error)
 	Create(db *gorm.DB, u *models.Users) (*models.Users, error)
+	Save(db *gorm.DB, u *models.Users) (*models.Users, error)
 }

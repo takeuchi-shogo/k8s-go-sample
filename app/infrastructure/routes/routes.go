@@ -16,6 +16,7 @@ import (
 type Routes struct {
 	DB  *database.DB
 	Gin *gin.Engine
+	Jwt *middleware.Jwt
 }
 
 func NewRoutes(c *config.Config, db *database.DB) *Routes {
@@ -37,11 +38,11 @@ func (r *Routes) setCors(cors *middleware.Cors) {
 
 func (r *Routes) setRouting() {
 
-	accountsController := controllers.NewAccountsController(r.DB)
-	blocksController := controllers.NewBlocksController(r.DB)
-	reportsController := controllers.NewReportsController(r.DB)
-	userProfilesController := controllers.NewUserProfilesController(r.DB)
-	usersController := controllers.NewUsersController(r.DB)
+	accountsController := controllers.NewAccountsController(controllers.AccountsControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	blocksController := controllers.NewBlocksController(controllers.BlocksControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	reportsController := controllers.NewReportsController(controllers.ReportsControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	userProfilesController := controllers.NewUserProfilesController(controllers.UserProfilesControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	usersController := controllers.NewUsersController(controllers.UsersControllerProvider{DB: r.DB, Jwt: r.Jwt})
 
 	// srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 	r.Gin.GET("/", playGround())
