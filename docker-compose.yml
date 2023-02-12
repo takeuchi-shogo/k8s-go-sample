@@ -10,6 +10,8 @@ services:
     tty: true #コンテナの永続化
     depends_on:
       - mysql
+    volumes:
+      - ./app:/app
     ports:
       - 8080:8080
     networks:

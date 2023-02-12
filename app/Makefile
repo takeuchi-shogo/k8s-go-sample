@@ -5,6 +5,9 @@ build:
 server:
 	go run cmd/main.go
 
+air:
+	mysql.server start; air -c .air.toml
+
 test:
 	echo Hello World!!
 
