@@ -26,8 +26,18 @@ type NewReports struct {
 }
 
 type NewUsers struct {
-	AccountID   int    `json:"account_id"`
 	DisplayName string `json:"display_name"`
-	SceenName   string `json:"sceen_name"`
+	ScreenName  string `json:"screen_name"`
 	Gender      string `json:"gender"`
+}
+
+type NewVerifyEmails struct {
+	Email string `json:"email"`
+}
+
+type VerifyEmails struct {
+	ID      string `json:"id"`
+	Email   string `json:"Email"`
+	Token   string `json:"Token"`
+	PINCode string `json:"PINCode"`
 }

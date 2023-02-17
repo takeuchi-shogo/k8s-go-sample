@@ -12,6 +12,8 @@ import (
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
+	"github.com/takeuchi-shogo/k8s-go-sample/interface/controllers"
+	"github.com/takeuchi-shogo/k8s-go-sample/utils"
 )
 
 // LoginStatus is the resolver for the login_status field.
@@ -35,6 +37,21 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input *types.NewAc
 	return a, nil
 }
 
+// CreateAccountAndUser is the resolver for the createAccountAndUser field.
+func (r *mutationResolver) CreateAccountAndUser(ctx context.Context, account types.NewAccounts, user types.NewUsers) (*models.Users, error) {
+	accountInput := &models.Accounts{}
+	accountInput.Email = account.Email
+	accountInput.Password = account.Password
+
+	userInput := &models.Users{}
+	userInput.DisplayName = user.DisplayName
+
+	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB)
+
+	userResponse, res := accountsGraphqlController.Post(accountInput, userInput)
+	return userResponse, res
+}
+
 // CreateBlock is the resolver for the createBlock field.
 func (r *mutationResolver) CreateBlock(ctx context.Context, input *types.NewBlocks) (*models.Blocks, error) {
 	panic(fmt.Errorf("not implemented: CreateBlock - createBlock"))
@@ -46,18 +63,46 @@ func (r *mutationResolver) CreateReport(ctx context.Context, input *types.NewRep
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input types.NewUsers) (*models.Users, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input *types.NewUsers) (*models.Users, error) {
 	panic(fmt.Errorf("not implemented: CreateUsers - createUsers"))
+}
+
+// CreateVerifyEmail is the resolver for the createVerifyEmail field.
+func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*types.VerifyEmails, error) {
+	panic(fmt.Errorf("not implemented: CreateVerifyEmail - createVerifyEmail"))
+}
+
+// Account is the resolver for the account field.
+func (r *queryResolver) Account(ctx context.Context, id string) (*models.Accounts, error) {
+	panic(fmt.Errorf("not implemented: Account - account"))
+}
+
+// Blocks is the resolver for the blocks field.
+func (r *queryResolver) Blocks(ctx context.Context) ([]*models.Blocks, error) {
+	panic(fmt.Errorf("not implemented: Blocks - blocks"))
+}
+
+// Block is the resolver for the block field.
+func (r *queryResolver) Block(ctx context.Context, id string) (*models.Blocks, error) {
+	panic(fmt.Errorf("not implemented: Block - block"))
+}
+
+// Reports is the resolver for the reports field.
+func (r *queryResolver) Reports(ctx context.Context) ([]*models.Reports, error) {
+	panic(fmt.Errorf("not implemented: Reports - reports"))
+}
+
+// Report is the resolver for the report field.
+func (r *queryResolver) Report(ctx context.Context, id string) (*models.Reports, error) {
+	panic(fmt.Errorf("not implemented: Report - report"))
 }
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.Users, error) {
 	for i := 0; i < 5; i++ {
-		// pass, _ := utils.GenerateFromPassword("pass")
 		user := &models.Users{
-			// ID: utils.RandomString(10),
-			// Name:     utils.RandomOwner(),
-			// Password: pass,
+			ID:          utils.RandomInt(99),
+			DisplayName: utils.RandomOwner(),
 		}
 		r.users = append(r.users, user)
 	}
@@ -77,9 +122,9 @@ func (r *queryResolver) User(ctx context.Context, id string) (*models.Users, err
 	return r.user, nil
 }
 
-// SceenName is the resolver for the sceen_name field.
-func (r *usersResolver) SceenName(ctx context.Context, obj *models.Users) (string, error) {
-	panic(fmt.Errorf("not implemented: SceenName - sceen_name"))
+// VerifyEmail is the resolver for the verify_email field.
+func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*types.VerifyEmails, error) {
+	panic(fmt.Errorf("not implemented: VerifyEmail - verify_email"))
 }
 
 // IsVerifiedEmail is the resolver for the is_verified_email field.
@@ -103,3 +148,13 @@ type accountsResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type usersResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *usersResolver) ScreenName(ctx context.Context, obj *models.Users) (string, error) {
+	panic(fmt.Errorf("not implemented: ScreenName - screen_name"))
+}

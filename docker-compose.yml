@@ -27,7 +27,7 @@ services:
       - ${DB_PORT}
     volumes:
       - ./mysql/migrations:/docker-entrypoint-initdb.d
-      # - ./mysql/data:/var/lib/mysql
+      - ./mysql/data:/var/lib/mysql
       - ./mysql/config/my.conf:/etc/mysql/conf.d/my.cnf
     # env_file:
     #   - ./app/app.env

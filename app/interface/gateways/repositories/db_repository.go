@@ -7,5 +7,9 @@ type DBRepository struct {
 }
 
 func (db *DBRepository) Connect() *gorm.DB {
-	return db.Connect()
+	return db.DB.Connect()
+}
+
+func (db *DBRepository) Begin() *gorm.DB {
+	return db.DB.Begin()
 }

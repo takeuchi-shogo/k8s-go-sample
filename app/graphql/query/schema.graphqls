@@ -50,12 +50,19 @@ type Users {
   id: ID!
   account_id: Int!
   display_name: String!
-  sceen_name: String!
+  screen_name: String!
   gender: String!
   location: String!
   is_authorize_email: Boolean!
   is_verified_email: Boolean!
   is_verified_age: Boolean!
+}
+
+type VerifyEmails {
+  id: ID!
+  Email: String!
+  Token: String!
+  PINCode: String!
 }
 
 # ========== query ==========
@@ -71,6 +78,7 @@ type Query {
   users: [Users!]!
   user(id: ID!): Users!
   # todos: [Todo!]!
+  verify_email(code: String!): VerifyEmails!
 }
 
 # ========== input ==========
@@ -97,18 +105,23 @@ input NewReports {
 # }
 
 input NewUsers {
-  account_id: Int!
   display_name: String!
-  sceen_name: String!
+  screen_name: String!
   gender: String!
+}
+
+input NewVerifyEmails {
+  email: String!
 }
 
 # ========== mutation ==========
 type Mutation {
   createAccount(input: NewAccounts): Accounts!
+  createAccountAndUser(account: NewAccounts!, user: NewUsers!): Users!
   createBlock(input: NewBlocks): Blocks!
   createReport(input: NewReports): Reports!
   # createUserProfile(input: ):
   # createTodo(input: NewTodo!): Todo!
-  createUser(input: NewUsers!): Users!
+  createUser(input: NewUsers): Users!
+  createVerifyEmail(input: NewVerifyEmails): VerifyEmails!
 }

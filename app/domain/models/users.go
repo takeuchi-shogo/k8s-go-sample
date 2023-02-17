@@ -8,8 +8,8 @@ type Users struct {
 	Gender           string `json:"gender"`
 	Location         string `json:"location"`
 	IsAuthorizeEmail bool   `json:"is_authorize_email"`
-	IsVerifiedAge    bool   `json:"is_verifed_age"`
-	CreateAt         int64  `json:"created_at"`
+	IsVerifiedAge    bool   `json:"is_verified_age"`
+	CreatedAt        int64  `json:"created_at"`
 	UpdatedAt        int64  `json:"updated_at"`
 	DeletedAt        *int64 `json:"deleted_at"`
 }

@@ -21,6 +21,7 @@ func (repo *AccountRepository) FindByID(db *gorm.DB, id int) (*models.Accounts, 
 func (repo *AccountRepository) Create(db *gorm.DB, a *models.Accounts) (*models.Accounts, error) {
 	account := &models.Accounts{}
 	account = a
+	fmt.Println(account)
 	if err := db.Create(account).Error; !errors.Is(err, nil) {
 		return nil, fmt.Errorf("failed account create: %w", err)
 	}

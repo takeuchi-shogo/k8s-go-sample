@@ -54,3 +54,7 @@ func connection(host, username, password, dbName string) *gorm.DB {
 func (db *DB) Connect() *gorm.DB {
 	return db.Connection
 }
+
+func (db *DB) Begin() *gorm.DB {
+	return db.Connection.Begin()
+}

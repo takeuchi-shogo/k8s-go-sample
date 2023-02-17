@@ -45,15 +45,18 @@ func (r *Routes) setRouting() {
 	usersController := controllers.NewUsersController(controllers.UsersControllerProvider{DB: r.DB, Jwt: r.Jwt})
 
 	// srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+
+	// GraphQL 用
 	r.Gin.GET("/", playGround())
-	r.Gin.POST("/query", graphqlHandler())
+	r.Gin.POST("/query", r.graphqlHandler())
 
 	r.Gin.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Hellow world!!",
+			"message": "Hello world!!",
 		})
 	})
 
+	// REST API用
 	v1 := r.Gin.Group("/v1")
 
 	// accounts
@@ -78,8 +81,8 @@ func (r *Routes) setRouting() {
 }
 
 // Defining the Graphql handler
-func graphqlHandler() gin.HandlerFunc {
-	h := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{}}))
+func (r *Routes) graphqlHandler() gin.HandlerFunc {
+	h := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{DB: r.DB}}))
 
 	// Post only
 	//
