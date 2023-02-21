@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -19,10 +20,11 @@ type Routes struct {
 	Jwt *middleware.Jwt
 }
 
-func NewRoutes(c *config.Config, db *database.DB) *Routes {
+func NewRoutes(c *config.Config, db *database.DB, jwt *middleware.Jwt) *Routes {
 	r := &Routes{
 		DB:  db,
 		Gin: gin.Default(),
+		Jwt: jwt,
 	}
 
 	r.setCors(middleware.NewCors(c))
@@ -47,6 +49,7 @@ func (r *Routes) setRouting() {
 	// srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
 	// GraphQL 用
+	r.Gin.Use(middleware.GinContextToContextMiddleware())
 	r.Gin.GET("/", playGround())
 	r.Gin.POST("/query", r.graphqlHandler())
 
@@ -82,7 +85,10 @@ func (r *Routes) setRouting() {
 
 // Defining the Graphql handler
 func (r *Routes) graphqlHandler() gin.HandlerFunc {
-	h := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{DB: r.DB}}))
+	h := handler.NewDefaultServer(graphql.NewExecutableSchema(graphql.Config{Resolvers: &graphql.Resolver{
+		DB:  r.DB,
+		Jwt: r.Jwt,
+	}}))
 
 	// Post only
 	//
@@ -90,6 +96,13 @@ func (r *Routes) graphqlHandler() gin.HandlerFunc {
 	// h.AddTransport(transport.POST{})
 
 	return func(c *gin.Context) {
+		fmt.Println(c.Request.Header.Get("Authorization"))
+		// Create JWT
+		// jwtToken := "testJwtToken"
+
+		// レスポンスヘッダーにJWTをセットする
+		// c.Header("Authorization", "Bearer "+jwtToken)
+
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }

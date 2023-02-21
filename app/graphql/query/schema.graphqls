@@ -60,9 +60,9 @@ type Users {
 
 type VerifyEmails {
   id: ID!
-  Email: String!
-  Token: String!
-  PINCode: String!
+  email: String!
+  token: String!
+  pin_code: String!
 }
 
 # ========== query ==========
@@ -93,6 +93,11 @@ input NewBlocks {
   blocked: Int!
 }
 
+input NewLogin {
+  email: String!
+  password: String!
+}
+
 input NewReports {
   reporter_id: Int!
   reported_id: Int!
@@ -110,6 +115,14 @@ input NewUsers {
   gender: String!
 }
 
+input UpdateUsers {
+  id: Int!
+  display_name: String!
+  screen_name: String!
+  gender: String!
+  location: String!
+}
+
 input NewVerifyEmails {
   email: String!
 }
@@ -120,8 +133,10 @@ type Mutation {
   createAccountAndUser(account: NewAccounts!, user: NewUsers!): Users!
   createBlock(input: NewBlocks): Blocks!
   createReport(input: NewReports): Reports!
+  login(input: NewLogin): Users!
   # createUserProfile(input: ):
   # createTodo(input: NewTodo!): Todo!
   createUser(input: NewUsers): Users!
+  updateUser(input: UpdateUsers): Users!
   createVerifyEmail(input: NewVerifyEmails): VerifyEmails!
 }

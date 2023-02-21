@@ -1,10 +1,13 @@
 package interactor
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/repository"
+	"github.com/takeuchi-shogo/k8s-go-sample/usecase/services"
+	"github.com/takeuchi-shogo/k8s-go-sample/utils"
 )
 
 type AccountGraphqlInteractor struct {
@@ -13,11 +16,12 @@ type AccountGraphqlInteractor struct {
 	User    repository.UserRepository
 }
 
-func (interactor *AccountGraphqlInteractor) Signup(account *models.Accounts, user *models.Users) (*models.Users, error) {
+func (interactor *AccountGraphqlInteractor) Signup(account *models.Accounts, user *models.Users) (*models.Users, *services.ResultStatus) {
 
 	db := interactor.DB.Begin()
 
 	account.PhoneNumber = "000000"
+	account.Password, _ = utils.GenerateFromPassword(account.Password)
 	account.LoginStatus = "login"
 	account.AccessLevel = 1
 	currentTime := time.Now().Unix()
@@ -27,10 +31,12 @@ func (interactor *AccountGraphqlInteractor) Signup(account *models.Accounts, use
 	createdAccount, err := interactor.Account.Create(db, account)
 	if err != nil {
 		db.Rollback()
-		return &models.Users{}, err
+		return &models.Users{}, services.NewResultStatus(http.StatusBadRequest, err)
 	}
 
 	user.AccountID = createdAccount.ID
+	user.UUID = utils.NewRandom()
+	user.ScreenName = utils.RandomScreenName()
 	user.IsAuthorizeEmail = false
 	user.IsVerifiedAge = false
 	user.CreatedAt = currentTime
@@ -39,9 +45,9 @@ func (interactor *AccountGraphqlInteractor) Signup(account *models.Accounts, use
 	createdUser, err := interactor.User.Create(db, user)
 	if err != nil {
 		db.Rollback()
-		return &models.Users{}, err
+		return &models.Users{}, services.NewResultStatus(http.StatusBadRequest, err)
 	}
 
 	db.Commit()
-	return createdUser, nil
+	return createdUser, services.NewResultStatus(http.StatusOK, nil)
 }

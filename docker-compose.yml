@@ -41,6 +41,19 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     networks:
       - k8s-sample-go-network
+  phpmyadmin:
+        image: phpmyadmin:5
+        restart: always
+        ports:
+            - 8181:80
+        environment:
+            # - PMA_ARBITRARY=1
+            - PMA_HOST=mysql
+            - PMA_USER=root
+            - PMA_PASSWORD=password
+            # - VIRTUAL_HOST=phpmyadmin.ticketvillage.leadi
+        networks:
+            - k8s-sample-go-network
 
 networks:
   k8s-sample-go-network:

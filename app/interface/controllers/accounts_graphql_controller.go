@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"context"
+
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
+	"github.com/takeuchi-shogo/k8s-go-sample/interface/helpers"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/interactor"
 )
 
@@ -21,8 +24,19 @@ func NewAccountsGraphqlController(db repositories.DB) *AccountsGraphqlController
 }
 
 func (controller *AccountsGraphqlController) Post(
+	ctx context.Context,
 	account *models.Accounts,
 	user *models.Users) (*models.Users, error) {
+
+	gc, err := helpers.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
 	createdUser, res := controller.Interactor.Signup(account, user)
-	return createdUser, res
+	if res.Error != nil {
+		return createdUser, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+	}
+
+	gc.Header("Authorization", "Bearer "+"jwt")
+	return createdUser, nil
 }

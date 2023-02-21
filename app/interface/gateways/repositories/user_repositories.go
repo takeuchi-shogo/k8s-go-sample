@@ -10,8 +10,41 @@ import (
 
 type UserRepository struct{}
 
+func (repo *UserRepository) Find(db *gorm.DB) ([]*models.Users, error) {
+	users := []models.Users{}
+	if err := db.Find(&users).Error; !errors.Is(err, nil) {
+		return []*models.Users{}, fmt.Errorf("failed user get: %w", err)
+	}
+	// TOD: スムーズに取得したい
+	foundUsers := []*models.Users{}
+	for _, u := range users {
+		foundUsers = append(foundUsers, &u)
+	}
+	return foundUsers, nil
+}
+
 func (repo *UserRepository) FindByID(db *gorm.DB, id int) (*models.Users, error) {
-	return &models.Users{}, nil
+	u := &models.Users{}
+	if err := db.First(u, id).Error; !errors.Is(err, nil) {
+		return nil, fmt.Errorf("failed user create: %w", err)
+	}
+	return u, nil
+}
+
+func (repo *UserRepository) FirstByAccountID(db *gorm.DB, accountID int) (*models.Users, error) {
+	u := &models.Users{}
+	if err := db.Where("account_id = ?", accountID).First(u).Error; !errors.Is(err, nil) {
+		return nil, fmt.Errorf("failed user create: %w", err)
+	}
+	return u, nil
+}
+
+func (repo *UserRepository) FirstByScreenName(db *gorm.DB, screenName string) (*models.Users, error) {
+	u := &models.Users{}
+	if err := db.Where("screen_name = ?", screenName).First(u).Error; !errors.Is(err, nil) {
+		return nil, fmt.Errorf("failed user create: %w", err)
+	}
+	return u, nil
 }
 
 func (repo *UserRepository) Create(db *gorm.DB, u *models.Users) (*models.Users, error) {

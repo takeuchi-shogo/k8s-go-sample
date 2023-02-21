@@ -2,6 +2,7 @@ package models
 
 type Users struct {
 	ID               int    `json:"id"`
+	UUID             string `json:"uuid"`
 	AccountID        int    `json:"account_id"`
 	DisplayName      string `json:"display_name"`
 	ScreenName       string `json:"screen_name"`

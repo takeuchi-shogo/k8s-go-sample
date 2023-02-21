@@ -65,6 +65,9 @@ models:
   Users:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Users"
+  VerifyEmails:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.VerifyEmails"
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID

@@ -2,6 +2,7 @@ package interactor
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/presenter"
@@ -17,6 +18,16 @@ type UserInteractor struct {
 	VerifyEmailRepository repository.VerifyEmailRepository
 }
 
+func (interactor *UserInteractor) GetList() ([]*models.Users, *services.ResultStatus) {
+	db := interactor.DBRepository.Connect()
+
+	users, err := interactor.UserRepository.Find(db)
+	if err != nil {
+		return []*models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
+	}
+	return users, services.NewResultStatus(http.StatusOK, nil)
+}
+
 func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
 
@@ -28,7 +39,7 @@ func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultSt
 }
 
 func (interactor *UserInteractor) Create(u *models.Users, accountID int, code string) (*models.Users, *services.ResultStatus) {
-	// repository prosess
+	// repository process
 	db := interactor.DBRepository.Connect()
 
 	account, err := interactor.AccountRepository.FindByID(db, accountID)
@@ -50,11 +61,28 @@ func (interactor *UserInteractor) Create(u *models.Users, accountID int, code st
 	return user, services.NewResultStatus(http.StatusOK, nil)
 }
 
+func setValue(user, foundUser *models.Users) *models.Users {
+	foundUser.DisplayName = user.DisplayName
+	foundUser.ScreenName = user.ScreenName
+	foundUser.Gender = user.Gender
+	foundUser.Location = user.Location
+	foundUser.UpdatedAt = time.Now().Unix()
+
+	return foundUser
+}
+
 func (interactor *UserInteractor) Save(u *models.Users) (*models.Users, *services.ResultStatus) {
 
 	db := interactor.DBRepository.Connect()
 
-	user, err := interactor.UserRepository.Save(db, u)
+	foundUser, err := interactor.UserRepository.FindByID(db, u.ID)
+	if err != nil {
+		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
+	}
+
+	updatedUser := setValue(u, foundUser)
+
+	user, err := interactor.UserRepository.Save(db, updatedUser)
 	if err != nil {
 		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
 	}

@@ -13,7 +13,6 @@ import (
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/controllers"
-	"github.com/takeuchi-shogo/k8s-go-sample/utils"
 )
 
 // LoginStatus is the resolver for the login_status field.
@@ -48,7 +47,7 @@ func (r *mutationResolver) CreateAccountAndUser(ctx context.Context, account typ
 
 	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB)
 
-	userResponse, res := accountsGraphqlController.Post(accountInput, userInput)
+	userResponse, res := accountsGraphqlController.Post(ctx, accountInput, userInput)
 	return userResponse, res
 }
 
@@ -62,14 +61,38 @@ func (r *mutationResolver) CreateReport(ctx context.Context, input *types.NewRep
 	panic(fmt.Errorf("not implemented: CreateReport - createReport"))
 }
 
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input *types.NewLogin) (*models.Users, error) {
+	fmt.Println("koko")
+	authorizeGraphqlController := controllers.NewAuthorizeGraphqlController(r.DB, r.Jwt)
+	return &models.Users{}, authorizeGraphqlController.Login(ctx, input.Email, input.Password)
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input *types.NewUsers) (*models.Users, error) {
 	panic(fmt.Errorf("not implemented: CreateUsers - createUsers"))
 }
 
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error) {
+	user := &models.Users{
+		ID:          input.ID,
+		DisplayName: input.DisplayName,
+		ScreenName:  input.ScreenName,
+		Gender:      input.Gender,
+		Location:    input.Location,
+	}
+
+	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB)
+
+	return usersGraphqlController.Patch(ctx, user)
+}
+
 // CreateVerifyEmail is the resolver for the createVerifyEmail field.
-func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*types.VerifyEmails, error) {
-	panic(fmt.Errorf("not implemented: CreateVerifyEmail - createVerifyEmail"))
+func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*models.VerifyEmails, error) {
+	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
+
+	return verifyEmailsGraphqlController.Post(ctx, input.Email)
 }
 
 // Account is the resolver for the account field.
@@ -99,15 +122,9 @@ func (r *queryResolver) Report(ctx context.Context, id string) (*models.Reports,
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*models.Users, error) {
-	for i := 0; i < 5; i++ {
-		user := &models.Users{
-			ID:          utils.RandomInt(99),
-			DisplayName: utils.RandomOwner(),
-		}
-		r.users = append(r.users, user)
-	}
-
-	return r.users, nil
+	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB)
+	fmt.Println(ctx.Value("users"))
+	return usersGraphqlController.GetList(ctx)
 }
 
 // User is the resolver for the user field.
@@ -123,8 +140,10 @@ func (r *queryResolver) User(ctx context.Context, id string) (*models.Users, err
 }
 
 // VerifyEmail is the resolver for the verify_email field.
-func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*types.VerifyEmails, error) {
-	panic(fmt.Errorf("not implemented: VerifyEmail - verify_email"))
+func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*models.VerifyEmails, error) {
+	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
+
+	return verifyEmailsGraphqlController.Get(ctx, code)
 }
 
 // IsVerifiedEmail is the resolver for the is_verified_email field.

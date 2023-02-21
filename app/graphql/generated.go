@@ -76,6 +76,8 @@ type ComplexityRoot struct {
 		CreateReport         func(childComplexity int, input *types.NewReports) int
 		CreateUser           func(childComplexity int, input *types.NewUsers) int
 		CreateVerifyEmail    func(childComplexity int, input *types.NewVerifyEmails) int
+		Login                func(childComplexity int, input *types.NewLogin) int
+		UpdateUser           func(childComplexity int, input *types.UpdateUsers) int
 	}
 
 	Query struct {
@@ -133,8 +135,10 @@ type MutationResolver interface {
 	CreateAccountAndUser(ctx context.Context, account types.NewAccounts, user types.NewUsers) (*models.Users, error)
 	CreateBlock(ctx context.Context, input *types.NewBlocks) (*models.Blocks, error)
 	CreateReport(ctx context.Context, input *types.NewReports) (*models.Reports, error)
+	Login(ctx context.Context, input *types.NewLogin) (*models.Users, error)
 	CreateUser(ctx context.Context, input *types.NewUsers) (*models.Users, error)
-	CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*types.VerifyEmails, error)
+	UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error)
+	CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*models.VerifyEmails, error)
 }
 type QueryResolver interface {
 	Account(ctx context.Context, id string) (*models.Accounts, error)
@@ -144,7 +148,7 @@ type QueryResolver interface {
 	Report(ctx context.Context, id string) (*models.Reports, error)
 	Users(ctx context.Context) ([]*models.Users, error)
 	User(ctx context.Context, id string) (*models.Users, error)
-	VerifyEmail(ctx context.Context, code string) (*types.VerifyEmails, error)
+	VerifyEmail(ctx context.Context, code string) (*models.VerifyEmails, error)
 }
 type UsersResolver interface {
 	IsVerifiedEmail(ctx context.Context, obj *models.Users) (bool, error)
@@ -320,6 +324,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateVerifyEmail(childComplexity, args["input"].(*types.NewVerifyEmails)), true
+
+	case "Mutation.login":
+		if e.complexity.Mutation.Login == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_login_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.Login(childComplexity, args["input"].(*types.NewLogin)), true
+
+	case "Mutation.updateUser":
+		if e.complexity.Mutation.UpdateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(*types.UpdateUsers)), true
 
 	case "Query.account":
 		if e.complexity.Query.Account == nil {
@@ -528,7 +556,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Users.ScreenName(childComplexity), true
 
-	case "VerifyEmails.Email":
+	case "VerifyEmails.email":
 		if e.complexity.VerifyEmails.Email == nil {
 			break
 		}
@@ -542,14 +570,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.VerifyEmails.ID(childComplexity), true
 
-	case "VerifyEmails.PINCode":
+	case "VerifyEmails.pin_code":
 		if e.complexity.VerifyEmails.PINCode == nil {
 			break
 		}
 
 		return e.complexity.VerifyEmails.PINCode(childComplexity), true
 
-	case "VerifyEmails.Token":
+	case "VerifyEmails.token":
 		if e.complexity.VerifyEmails.Token == nil {
 			break
 		}
@@ -566,9 +594,11 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewAccounts,
 		ec.unmarshalInputNewBlocks,
+		ec.unmarshalInputNewLogin,
 		ec.unmarshalInputNewReports,
 		ec.unmarshalInputNewUsers,
 		ec.unmarshalInputNewVerifyEmails,
+		ec.unmarshalInputUpdateUsers,
 	)
 	first := true
 
@@ -739,6 +769,36 @@ func (ec *executionContext) field_Mutation_createVerifyEmail_args(ctx context.Co
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalONewVerifyEmails2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewVerifyEmails(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *types.NewLogin
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalONewLogin2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewLogin(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *types.UpdateUsers
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOUpdateUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateUsers(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1671,6 +1731,80 @@ func (ec *executionContext) fieldContext_Mutation_createReport(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_login(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(*types.NewLogin))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Users)
+	fc.Result = res
+	return ec.marshalNUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUsers(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Users_id(ctx, field)
+			case "account_id":
+				return ec.fieldContext_Users_account_id(ctx, field)
+			case "display_name":
+				return ec.fieldContext_Users_display_name(ctx, field)
+			case "screen_name":
+				return ec.fieldContext_Users_screen_name(ctx, field)
+			case "gender":
+				return ec.fieldContext_Users_gender(ctx, field)
+			case "location":
+				return ec.fieldContext_Users_location(ctx, field)
+			case "is_authorize_email":
+				return ec.fieldContext_Users_is_authorize_email(ctx, field)
+			case "is_verified_email":
+				return ec.fieldContext_Users_is_verified_email(ctx, field)
+			case "is_verified_age":
+				return ec.fieldContext_Users_is_verified_age(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Users", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_login_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createUser(ctx, field)
 	if err != nil {
@@ -1745,6 +1879,80 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUser(rctx, fc.Args["input"].(*types.UpdateUsers))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Users)
+	fc.Result = res
+	return ec.marshalNUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUsers(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Users_id(ctx, field)
+			case "account_id":
+				return ec.fieldContext_Users_account_id(ctx, field)
+			case "display_name":
+				return ec.fieldContext_Users_display_name(ctx, field)
+			case "screen_name":
+				return ec.fieldContext_Users_screen_name(ctx, field)
+			case "gender":
+				return ec.fieldContext_Users_gender(ctx, field)
+			case "location":
+				return ec.fieldContext_Users_location(ctx, field)
+			case "is_authorize_email":
+				return ec.fieldContext_Users_is_authorize_email(ctx, field)
+			case "is_verified_email":
+				return ec.fieldContext_Users_is_verified_email(ctx, field)
+			case "is_verified_age":
+				return ec.fieldContext_Users_is_verified_age(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Users", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createVerifyEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createVerifyEmail(ctx, field)
 	if err != nil {
@@ -1770,9 +1978,9 @@ func (ec *executionContext) _Mutation_createVerifyEmail(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.VerifyEmails)
+	res := resTmp.(*models.VerifyEmails)
 	fc.Result = res
-	return ec.marshalNVerifyEmails2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐVerifyEmails(ctx, field.Selections, res)
+	return ec.marshalNVerifyEmails2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐVerifyEmails(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createVerifyEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1785,12 +1993,12 @@ func (ec *executionContext) fieldContext_Mutation_createVerifyEmail(ctx context.
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_VerifyEmails_id(ctx, field)
-			case "Email":
-				return ec.fieldContext_VerifyEmails_Email(ctx, field)
-			case "Token":
-				return ec.fieldContext_VerifyEmails_Token(ctx, field)
-			case "PINCode":
-				return ec.fieldContext_VerifyEmails_PINCode(ctx, field)
+			case "email":
+				return ec.fieldContext_VerifyEmails_email(ctx, field)
+			case "token":
+				return ec.fieldContext_VerifyEmails_token(ctx, field)
+			case "pin_code":
+				return ec.fieldContext_VerifyEmails_pin_code(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type VerifyEmails", field.Name)
 		},
@@ -2269,9 +2477,9 @@ func (ec *executionContext) _Query_verify_email(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*types.VerifyEmails)
+	res := resTmp.(*models.VerifyEmails)
 	fc.Result = res
-	return ec.marshalNVerifyEmails2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐVerifyEmails(ctx, field.Selections, res)
+	return ec.marshalNVerifyEmails2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐVerifyEmails(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_verify_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2284,12 +2492,12 @@ func (ec *executionContext) fieldContext_Query_verify_email(ctx context.Context,
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_VerifyEmails_id(ctx, field)
-			case "Email":
-				return ec.fieldContext_VerifyEmails_Email(ctx, field)
-			case "Token":
-				return ec.fieldContext_VerifyEmails_Token(ctx, field)
-			case "PINCode":
-				return ec.fieldContext_VerifyEmails_PINCode(ctx, field)
+			case "email":
+				return ec.fieldContext_VerifyEmails_email(ctx, field)
+			case "token":
+				return ec.fieldContext_VerifyEmails_token(ctx, field)
+			case "pin_code":
+				return ec.fieldContext_VerifyEmails_pin_code(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type VerifyEmails", field.Name)
 		},
@@ -3227,7 +3435,7 @@ func (ec *executionContext) fieldContext_Users_is_verified_age(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _VerifyEmails_id(ctx context.Context, field graphql.CollectedField, obj *types.VerifyEmails) (ret graphql.Marshaler) {
+func (ec *executionContext) _VerifyEmails_id(ctx context.Context, field graphql.CollectedField, obj *models.VerifyEmails) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VerifyEmails_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -3253,9 +3461,9 @@ func (ec *executionContext) _VerifyEmails_id(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNID2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VerifyEmails_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3271,8 +3479,8 @@ func (ec *executionContext) fieldContext_VerifyEmails_id(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _VerifyEmails_Email(ctx context.Context, field graphql.CollectedField, obj *types.VerifyEmails) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VerifyEmails_Email(ctx, field)
+func (ec *executionContext) _VerifyEmails_email(ctx context.Context, field graphql.CollectedField, obj *models.VerifyEmails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VerifyEmails_email(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3302,7 +3510,7 @@ func (ec *executionContext) _VerifyEmails_Email(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_VerifyEmails_Email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_VerifyEmails_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "VerifyEmails",
 		Field:      field,
@@ -3315,8 +3523,8 @@ func (ec *executionContext) fieldContext_VerifyEmails_Email(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _VerifyEmails_Token(ctx context.Context, field graphql.CollectedField, obj *types.VerifyEmails) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VerifyEmails_Token(ctx, field)
+func (ec *executionContext) _VerifyEmails_token(ctx context.Context, field graphql.CollectedField, obj *models.VerifyEmails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VerifyEmails_token(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3346,7 +3554,7 @@ func (ec *executionContext) _VerifyEmails_Token(ctx context.Context, field graph
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_VerifyEmails_Token(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_VerifyEmails_token(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "VerifyEmails",
 		Field:      field,
@@ -3359,8 +3567,8 @@ func (ec *executionContext) fieldContext_VerifyEmails_Token(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _VerifyEmails_PINCode(ctx context.Context, field graphql.CollectedField, obj *types.VerifyEmails) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VerifyEmails_PINCode(ctx, field)
+func (ec *executionContext) _VerifyEmails_pin_code(ctx context.Context, field graphql.CollectedField, obj *models.VerifyEmails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VerifyEmails_pin_code(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3390,7 +3598,7 @@ func (ec *executionContext) _VerifyEmails_PINCode(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_VerifyEmails_PINCode(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_VerifyEmails_pin_code(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "VerifyEmails",
 		Field:      field,
@@ -5256,6 +5464,42 @@ func (ec *executionContext) unmarshalInputNewBlocks(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewLogin(ctx context.Context, obj interface{}) (types.NewLogin, error) {
+	var it types.NewLogin
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "password"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewReports(ctx context.Context, obj interface{}) (types.NewReports, error) {
 	var it types.NewReports
 	asMap := map[string]interface{}{}
@@ -5363,6 +5607,66 @@ func (ec *executionContext) unmarshalInputNewVerifyEmails(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj interface{}) (types.UpdateUsers, error) {
+	var it types.UpdateUsers
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "display_name", "screen_name", "gender", "location"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "display_name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("display_name"))
+			it.DisplayName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "screen_name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("screen_name"))
+			it.ScreenName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "gender":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gender"))
+			it.Gender, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			it.Location, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5595,10 +5899,22 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_createReport(ctx, field)
 			})
 
+		case "login":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_login(ctx, field)
+			})
+
 		case "createUser":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUser(ctx, field)
+			})
+
+		case "updateUser":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUser(ctx, field)
 			})
 
 		case "createVerifyEmail":
@@ -6017,7 +6333,7 @@ func (ec *executionContext) _Users(ctx context.Context, sel ast.SelectionSet, ob
 
 var verifyEmailsImplementors = []string{"VerifyEmails"}
 
-func (ec *executionContext) _VerifyEmails(ctx context.Context, sel ast.SelectionSet, obj *types.VerifyEmails) graphql.Marshaler {
+func (ec *executionContext) _VerifyEmails(ctx context.Context, sel ast.SelectionSet, obj *models.VerifyEmails) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, verifyEmailsImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
@@ -6032,23 +6348,23 @@ func (ec *executionContext) _VerifyEmails(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Email":
+		case "email":
 
-			out.Values[i] = ec._VerifyEmails_Email(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "Token":
-
-			out.Values[i] = ec._VerifyEmails_Token(ctx, field, obj)
+			out.Values[i] = ec._VerifyEmails_email(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "PINCode":
+		case "token":
 
-			out.Values[i] = ec._VerifyEmails_PINCode(ctx, field, obj)
+			out.Values[i] = ec._VerifyEmails_token(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "pin_code":
+
+			out.Values[i] = ec._VerifyEmails_pin_code(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -6655,11 +6971,11 @@ func (ec *executionContext) marshalNUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk
 	return ec._Users(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNVerifyEmails2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐVerifyEmails(ctx context.Context, sel ast.SelectionSet, v types.VerifyEmails) graphql.Marshaler {
+func (ec *executionContext) marshalNVerifyEmails2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐVerifyEmails(ctx context.Context, sel ast.SelectionSet, v models.VerifyEmails) graphql.Marshaler {
 	return ec._VerifyEmails(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNVerifyEmails2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐVerifyEmails(ctx context.Context, sel ast.SelectionSet, v *types.VerifyEmails) graphql.Marshaler {
+func (ec *executionContext) marshalNVerifyEmails2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐVerifyEmails(ctx context.Context, sel ast.SelectionSet, v *models.VerifyEmails) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -6964,6 +7280,14 @@ func (ec *executionContext) unmarshalONewBlocks2ᚖgithubᚗcomᚋtakeuchiᚑsho
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalONewLogin2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewLogin(ctx context.Context, v interface{}) (*types.NewLogin, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewLogin(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalONewReports2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewReports(ctx context.Context, v interface{}) (*types.NewReports, error) {
 	if v == nil {
 		return nil, nil
@@ -7002,6 +7326,14 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOUpdateUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateUsers(ctx context.Context, v interface{}) (*types.UpdateUsers, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateUsers(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

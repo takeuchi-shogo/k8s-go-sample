@@ -18,6 +18,14 @@ func (repo *AccountRepository) FindByID(db *gorm.DB, id int) (*models.Accounts, 
 	return account, nil
 }
 
+func (repo *AccountRepository) FirstByEmail(db *gorm.DB, email string) (*models.Accounts, error) {
+	account := &models.Accounts{}
+	if err := db.Where("email = ?", email).First(account).Error; !errors.Is(err, nil) {
+		return nil, fmt.Errorf("failed find account by email: %w", err)
+	}
+	return account, nil
+}
+
 func (repo *AccountRepository) Create(db *gorm.DB, a *models.Accounts) (*models.Accounts, error) {
 	account := &models.Accounts{}
 	account = a

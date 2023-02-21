@@ -1,6 +1,9 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"net/mail"
+)
 
 func ValidateString(value string, min, max int) error {
 	n := len(value)
@@ -12,4 +15,14 @@ func ValidateString(value string, min, max int) error {
 
 func ValidatePassword(value string) error {
 	return ValidateString(value, 6, 12)
+}
+
+func ValidateEmail(value string) error {
+	if err := ValidateString(value, 3, 200); err != nil {
+		return err
+	}
+	if _, err := mail.ParseAddress(value); err != nil {
+		return fmt.Errorf("is not a valid email address")
+	}
+	return nil
 }

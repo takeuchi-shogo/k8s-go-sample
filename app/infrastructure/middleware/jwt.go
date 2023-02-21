@@ -3,7 +3,9 @@ package middleware
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -25,23 +27,24 @@ type UnsignedResponse struct {
 func NewJwtAuth(c *config.Config) *Jwt {
 	return &Jwt{
 		ApplicationName: c.ApplicationName,
-		TokenExpireAt:   c.Jwt.TokenExpireAt,
-		SecretKey:       c.Jwt.SecretKey,
+		TokenExpireAt:   c.TokenExpireAt,
+		SecretKey:       c.SecretKey,
 	}
 }
 
 // Create json web token
 func (j *Jwt) CreateToken(userID int) string {
-	claim := jwt.MapClaims{
-		"iss": j.ApplicationName,                                                 // Issuer
-		"aud": userID,                                                            // Audience
-		"exp": time.Now().Add(time.Hour * time.Duration(j.TokenExpireAt)).Unix(), // Expiration Time. 1day
+	log.Println("6", userID, j.ApplicationName, j.TokenExpireAt)
+	claim := &jwt.StandardClaims{
+		ExpiresAt: time.Now().Add(time.Hour * time.Duration(j.TokenExpireAt)).Unix(),
+		Issuer:    j.ApplicationName,
+		Audience:  strconv.Itoa(userID),
 	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claim)
+	// ES256 には公開鍵と秘密鍵のペアが必要で、HS256 には秘密鍵のみが必要
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
 
 	// Add Signature to Token
 	tokenString, _ := token.SignedString([]byte(j.SecretKey))
-
 	return tokenString
 }
 

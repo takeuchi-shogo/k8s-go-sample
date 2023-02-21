@@ -19,6 +19,11 @@ type NewBlocks struct {
 	Blocked  int `json:"blocked"`
 }
 
+type NewLogin struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
 type NewReports struct {
 	ReporterID int    `json:"reporter_id"`
 	ReportedID int    `json:"reported_id"`
@@ -35,9 +40,10 @@ type NewVerifyEmails struct {
 	Email string `json:"email"`
 }
 
-type VerifyEmails struct {
-	ID      string `json:"id"`
-	Email   string `json:"Email"`
-	Token   string `json:"Token"`
-	PINCode string `json:"PINCode"`
+type UpdateUsers struct {
+	ID          int    `json:"id"`
+	DisplayName string `json:"display_name"`
+	ScreenName  string `json:"screen_name"`
+	Gender      string `json:"gender"`
+	Location    string `json:"location"`
 }

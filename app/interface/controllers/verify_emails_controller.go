@@ -27,18 +27,17 @@ func NewVerifyEmailsController(p VerifyEmailsControllerProvider) *verifyEmailsCo
 func (controller *verifyEmailsController) GetByPINCode(c helpers.Context) {
 	pinCode := c.Query("pin_code")
 
-	res := controller.Interactor.GetByPINCode(pinCode)
+	_, res := controller.Interactor.GetByPINCode(pinCode)
 	if res.Error != nil {
 		return
 	}
 	c.JSON(res.Code, helpers.NewResponseSuccess("success", nil))
-
 }
 
 func (controller *verifyEmailsController) Post(c helpers.Context) {
 	email := c.PostForm("email")
 
-	res := controller.Interactor.Create(email)
+	_, res := controller.Interactor.Create(email)
 	if res.Error != nil {
 		return
 	}
