@@ -39,6 +39,7 @@ func (j *Jwt) CreateToken(userID int) string {
 		ExpiresAt: time.Now().Add(time.Hour * time.Duration(j.TokenExpireAt)).Unix(),
 		Issuer:    j.ApplicationName,
 		Audience:  strconv.Itoa(userID),
+		IssuedAt:  time.Now().Unix(),
 	}
 	// ES256 には公開鍵と秘密鍵のペアが必要で、HS256 には秘密鍵のみが必要
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)

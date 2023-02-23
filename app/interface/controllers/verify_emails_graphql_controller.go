@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
@@ -27,6 +28,7 @@ func (controller *VerifyEmailsGraphqlController) Get(ctx context.Context, code s
 	if res.Error != nil {
 		return verifyEmail, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
+	fmt.Println(verifyEmail)
 	return verifyEmail, nil
 }
 

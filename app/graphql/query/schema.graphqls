@@ -48,6 +48,7 @@ type UserProfiles {
 
 type Users {
   id: ID!
+  uuid: String!
   account_id: Int!
   display_name: String!
   screen_name: String!

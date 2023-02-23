@@ -129,14 +129,10 @@ func (r *queryResolver) Users(ctx context.Context) ([]*models.Users, error) {
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*models.Users, error) {
-	// pass, _ := utils.GenerateFromPassword("pass")
 	ids, _ := strconv.Atoi(id)
-	r.user = &models.Users{
-		ID: ids,
-		// Name:     "test" + id,
-		// Password: pass,
-	}
-	return r.user, nil
+	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB)
+
+	return usersGraphqlController.Get(ctx, ids)
 }
 
 // VerifyEmail is the resolver for the verify_email field.

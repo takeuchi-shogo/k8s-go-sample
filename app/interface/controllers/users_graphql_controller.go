@@ -40,6 +40,20 @@ func (controller *UsersGraphqlController) GetList(ctx context.Context) ([]*model
 	return users, nil
 }
 
+func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*models.Users, error) {
+	user, res := controller.Interactor.Get(id)
+	if res.Error != nil {
+		return user, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+	}
+	// gc, err := helpers.GinContextFromContext(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// gc.Header("Authorization", "Bearer "+"testJwtToken")
+
+	return user, nil
+}
+
 func (controller *UsersGraphqlController) Patch(ctx context.Context, user *models.Users) (*models.Users, error) {
 	updatedUser, res := controller.Interactor.Save(user)
 	if res.Error != nil {
