@@ -7,6 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func SetHeader(ctx context.Context, token string) error {
+	gc, err := GinContextFromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	gc.Header("Authorization", "Bearer "+token)
+
+	return nil
+}
+
 // context to gin.Context
 func GinContextFromContext(ctx context.Context) (*gin.Context, error) {
 	ginContext := ctx.Value("GinContextKey")

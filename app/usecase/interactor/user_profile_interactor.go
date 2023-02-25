@@ -32,3 +32,13 @@ func (interactor *UserProfileInteractor) Create(p *models.UserProfiles) (*models
 	}
 	return profile, services.NewResultStatus(http.StatusOK, nil)
 }
+
+func (interactor *UserProfileInteractor) Save(up *models.UserProfiles) (*models.UserProfiles, *services.ResultStatus) {
+	db := interactor.DBRepository.Connect()
+
+	profile, err := interactor.UserProfileRepository.Save(db, up)
+	if err != nil {
+		return &models.UserProfiles{}, services.NewResultStatus(http.StatusBadRequest, err)
+	}
+	return profile, services.NewResultStatus(http.StatusOK, nil)
+}

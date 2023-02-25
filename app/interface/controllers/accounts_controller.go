@@ -7,7 +7,6 @@ import (
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/helpers"
-	"github.com/takeuchi-shogo/k8s-go-sample/interface/presenters"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/interactor"
 )
 
@@ -34,7 +33,7 @@ func NewAccountsController(p AccountsControllerProvider) *accountsController {
 		Interactor: interactor.AccountInteractor{
 			AccountRepository: &repositories.AccountRepository{},
 			DBRepository:      &repositories.DBRepository{DB: p.DB},
-			AccountPresenter:  &presenters.AccountsPresenter{},
+			// AccountPresenter:  &presenters.AccountsPresenter{},
 		},
 	}
 }

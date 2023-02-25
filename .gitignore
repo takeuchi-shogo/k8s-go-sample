@@ -9,3 +9,5 @@
 *.env
 
 .vscode
+
+sample_users.txt

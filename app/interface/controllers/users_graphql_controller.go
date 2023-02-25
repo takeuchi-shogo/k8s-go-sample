@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/helpers"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/presenters"
@@ -26,10 +27,10 @@ func NewUsersGraphqlController(db repositories.DB) *UsersGraphqlController {
 	}
 }
 
-func (controller *UsersGraphqlController) GetList(ctx context.Context) ([]*models.Users, error) {
-	users, res := controller.Interactor.GetList()
+func (controller *UsersGraphqlController) GetList(ctx context.Context, first int, after string, filter *types.UserFilter) (*types.UserConnection, error) {
+	users, res := controller.Interactor.GetList(first, after, filter)
 	if res.Error != nil {
-		return users, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+		return &types.UserConnection{}, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
 	// gc, err := helpers.GinContextFromContext(ctx)
 	// if err != nil {

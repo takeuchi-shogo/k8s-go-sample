@@ -51,7 +51,7 @@ func (r *Routes) setRouting() {
 	// GraphQL 用
 	r.Gin.Use(middleware.GinContextToContextMiddleware())
 	r.Gin.GET("/", playGround())
-	r.Gin.POST("/query", r.graphqlHandler())
+	r.Gin.POST("/graphql", r.graphqlHandler())
 
 	r.Gin.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -108,7 +108,7 @@ func (r *Routes) graphqlHandler() gin.HandlerFunc {
 }
 
 func playGround() gin.HandlerFunc {
-	h := playground.Handler("GraphQL", "/query")
+	h := playground.Handler("GraphQL", "/graphql")
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
 	}

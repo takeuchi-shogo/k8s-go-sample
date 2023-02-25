@@ -4,6 +4,8 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
@@ -25,24 +27,20 @@ type AuthToken struct {
 	User     *models.Users
 }
 
-func (interactor *AuthorizeInteractor) Verify(token string) (*models.Users, *services.ResultStatus) {
-	claims, err := interactor.Jwt.ParseToken(token)
+func (interactor *AuthorizeInteractor) Verify(token string) (int, *services.ResultStatus) {
+	claims, err := interactor.Jwt.ParseToken(strings.Split(token, "Bearer ")[1])
 	if err != nil {
-		return &models.Users{}, services.NewResultStatus(http.StatusUnauthorized, err)
+		return 0, services.NewResultStatus(http.StatusUnauthorized, err)
 	}
 
 	// check token
 	if isTokenExpire(int64(claims["exp"].(float64))) {
-		return &models.Users{}, services.NewResultStatus(http.StatusUnauthorized, err)
+		return 0, services.NewResultStatus(http.StatusUnauthorized, err)
 	}
 
-	db := interactor.DBRepository.Connect()
+	userID, _ := strconv.Atoi(claims["aud"].(string))
 
-	foundUser, err := interactor.UserRepository.FindByID(db, claims["aud"].(int))
-	if err != nil {
-		return &models.Users{}, services.NewResultStatus(http.StatusUnauthorized, err)
-	}
-	return foundUser, services.NewResultStatus(http.StatusOK, nil)
+	return userID, services.NewResultStatus(200, nil)
 }
 
 func (interactor *AuthorizeInteractor) Create(user *models.Users) (auth AuthToken, resultStatus *services.ResultStatus) {

@@ -2,9 +2,11 @@ package interactor
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/presenter"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/repository"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/services"
@@ -18,14 +20,45 @@ type UserInteractor struct {
 	VerifyEmailRepository repository.VerifyEmailRepository
 }
 
-func (interactor *UserInteractor) GetList() ([]*models.Users, *services.ResultStatus) {
+func getCursor(user *models.Users) string {
+	return strconv.Itoa(user.ID)
+}
+
+func (interactor *UserInteractor) GetList(first int, after string, filter *types.UserFilter) (*types.UserConnection, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
 
-	users, err := interactor.UserRepository.Find(db)
+	users, err := interactor.UserRepository.FindByUserFilter(db, filter, first+1, after)
 	if err != nil {
-		return []*models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
+		return &types.UserConnection{}, services.NewResultStatus(http.StatusNotFound, err)
 	}
-	return users, services.NewResultStatus(http.StatusOK, nil)
+
+	edges := []*types.UserEdge{}
+
+	for _, user := range users {
+		userEdge := &types.UserEdge{
+			Cursor: getCursor(user),
+			Node:   user,
+		}
+		edges = append(edges, userEdge)
+	}
+
+	pageInfo := &types.PageInfo{
+		HasNextPage:     len(users) > first,
+		HasPreviousPage: after != "",
+	}
+
+	if pageInfo.HasNextPage {
+		pageInfo.EndCursor = &users[len(users)-1].ScreenName
+		edges = edges[:len(users)-1]
+	}
+	if len(users) > 0 {
+		pageInfo.StartCursor = &users[0].ScreenName
+	}
+
+	return &types.UserConnection{
+		Edges:    edges,
+		PageInfo: pageInfo,
+	}, services.NewResultStatus(http.StatusOK, nil)
 }
 
 func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultStatus) {

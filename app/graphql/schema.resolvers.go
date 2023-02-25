@@ -7,7 +7,6 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
@@ -32,7 +31,6 @@ func (r *mutationResolver) CreateAccount(ctx context.Context, input *types.NewAc
 		Email:       input.Email,
 		Password:    input.Password,
 	}
-	log.Println(a)
 	return a, nil
 }
 
@@ -45,7 +43,7 @@ func (r *mutationResolver) CreateAccountAndUser(ctx context.Context, account typ
 	userInput := &models.Users{}
 	userInput.DisplayName = user.DisplayName
 
-	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB)
+	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB, r.Jwt)
 
 	userResponse, res := accountsGraphqlController.Post(ctx, accountInput, userInput)
 	return userResponse, res
@@ -73,6 +71,20 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input *types.NewUsers
 	panic(fmt.Errorf("not implemented: CreateUsers - createUsers"))
 }
 
+// UpdateAccount is the resolver for the updateAccount field.
+func (r *mutationResolver) UpdateAccount(ctx context.Context, input *types.UpdateAccounts) (*models.Accounts, error) {
+	account := &models.Accounts{
+		ID:          input.ID,
+		PhoneNumber: input.PhoneNumber,
+		Email:       input.Email,
+		Password:    input.Password,
+	}
+
+	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB, r.Jwt)
+
+	return accountsGraphqlController.Patch(ctx, account)
+}
+
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error) {
 	user := &models.Users{
@@ -97,7 +109,11 @@ func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, input *types.N
 
 // Account is the resolver for the account field.
 func (r *queryResolver) Account(ctx context.Context, id string) (*models.Accounts, error) {
-	panic(fmt.Errorf("not implemented: Account - account"))
+	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB, r.Jwt)
+
+	userID, _ := strconv.Atoi(id)
+
+	return accountsGraphqlController.Get(ctx, userID)
 }
 
 // Blocks is the resolver for the blocks field.
@@ -108,6 +124,13 @@ func (r *queryResolver) Blocks(ctx context.Context) ([]*models.Blocks, error) {
 // Block is the resolver for the block field.
 func (r *queryResolver) Block(ctx context.Context, id string) (*models.Blocks, error) {
 	panic(fmt.Errorf("not implemented: Block - block"))
+}
+
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*models.Users, error) {
+	meGraphqlController := controllers.NewMeGraphqlController(r.DB, r.Jwt)
+
+	return meGraphqlController.Get(ctx)
 }
 
 // Reports is the resolver for the reports field.
@@ -121,10 +144,9 @@ func (r *queryResolver) Report(ctx context.Context, id string) (*models.Reports,
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context) ([]*models.Users, error) {
+func (r *queryResolver) Users(ctx context.Context, first int, after string, filter *types.UserFilter) (*types.UserConnection, error) {
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB)
-	fmt.Println(ctx.Value("users"))
-	return usersGraphqlController.GetList(ctx)
+	return usersGraphqlController.GetList(ctx, first, after, filter)
 }
 
 // User is the resolver for the user field.

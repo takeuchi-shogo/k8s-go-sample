@@ -2,6 +2,10 @@
 
 package types
 
+import (
+	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+)
+
 type Matches struct {
 	ID           string `json:"id"`
 	MaleUserID   int    `json:"male_user_id"`
@@ -40,10 +44,48 @@ type NewVerifyEmails struct {
 	Email string `json:"email"`
 }
 
+type PageInfo struct {
+	HasNextPage     bool    `json:"hasNextPage"`
+	HasPreviousPage bool    `json:"hasPreviousPage"`
+	StartCursor     *string `json:"startCursor"`
+	EndCursor       *string `json:"endCursor"`
+}
+
+type UpdateAccounts struct {
+	ID          int    `json:"id"`
+	PhoneNumber string `json:"phone_number"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+}
+
+type UpdateUserProfiles struct {
+	ID           string `json:"id"`
+	UserID       int    `json:"user_id"`
+	Introduction string `json:"introduction"`
+	Interests    string `json:"interests"`
+	LookingFor   string `json:"looking_for"`
+}
+
 type UpdateUsers struct {
 	ID          int    `json:"id"`
 	DisplayName string `json:"display_name"`
 	ScreenName  string `json:"screen_name"`
 	Gender      string `json:"gender"`
 	Location    string `json:"location"`
+}
+
+type UserConnection struct {
+	Edges    []*UserEdge `json:"edges"`
+	PageInfo *PageInfo   `json:"pageInfo"`
+}
+
+type UserEdge struct {
+	Cursor string        `json:"cursor"`
+	Node   *models.Users `json:"node"`
+}
+
+type UserFilter struct {
+	Age      *int    `json:"age"`
+	Gender   *string `json:"gender"`
+	Location *string `json:"location"`
 }

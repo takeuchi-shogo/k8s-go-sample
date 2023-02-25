@@ -3,24 +3,45 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"gorm.io/gorm"
 )
 
 type UserRepository struct{}
 
 func (repo *UserRepository) Find(db *gorm.DB) ([]*models.Users, error) {
-	users := []models.Users{}
+	users := []*models.Users{}
 	if err := db.Find(&users).Error; !errors.Is(err, nil) {
 		return []*models.Users{}, fmt.Errorf("failed user get: %w", err)
 	}
-	// TOD: スムーズに取得したい
-	foundUsers := []*models.Users{}
-	for _, u := range users {
-		foundUsers = append(foundUsers, &u)
+	return users, nil
+}
+
+func (repo *UserRepository) FindByUserFilter(db *gorm.DB, filter *types.UserFilter, limit int, after string) ([]*models.Users, error) {
+	users := []*models.Users{}
+
+	query := db.Order("created_at desc")
+
+	if filter != nil {
+		if *filter.Gender != "" {
+			query = query.Where("gender = ?", *filter.Gender)
+		}
+		if *filter.Location != "" {
+			query = query.Where("location = ?", *filter.Location)
+		}
 	}
-	return foundUsers, nil
+
+	if after != "" {
+		id, _ := strconv.Atoi(after)
+		query = query.Where("id < ?", id)
+	}
+
+	query = query.Limit(limit).Find(&users)
+
+	return users, query.Error
 }
 
 func (repo *UserRepository) FindByID(db *gorm.DB, id int) (*models.Users, error) {
