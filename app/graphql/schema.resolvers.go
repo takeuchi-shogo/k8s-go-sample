@@ -71,6 +71,30 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input *types.NewUsers
 	panic(fmt.Errorf("not implemented: CreateUsers - createUsers"))
 }
 
+// CreateUserSearchFilters is the resolver for the createUserSearchFilters field.
+func (r *mutationResolver) CreateUserSearchFilters(ctx context.Context, input *types.NewUserSearchFilters) (*models.UserSearchFilters, error) {
+	usf := &models.UserSearchFilters{
+		Gender:   input.Gender,
+		Location: input.Location,
+	}
+	userSearchFiltersGraphqlController := controllers.NewUserSearchFilterGraphqlController(r.DB, r.Jwt)
+
+	return userSearchFiltersGraphqlController.Post(ctx, usf)
+}
+
+// UpdateUserSearchFilters is the resolver for the updateUserSearchFilters field.
+func (r *mutationResolver) UpdateUserSearchFilters(ctx context.Context, input *types.UpdateUserSearchFilters) (*models.UserSearchFilters, error) {
+	id, _ := strconv.Atoi(input.ID)
+	usf := &models.UserSearchFilters{
+		ID:       id,
+		Gender:   input.Gender,
+		Location: input.Location,
+	}
+	userSearchFiltersGraphqlController := controllers.NewUserSearchFilterGraphqlController(r.DB, r.Jwt)
+
+	return userSearchFiltersGraphqlController.Patch(ctx, usf)
+}
+
 // UpdateAccount is the resolver for the updateAccount field.
 func (r *mutationResolver) UpdateAccount(ctx context.Context, input *types.UpdateAccounts) (*models.Accounts, error) {
 	account := &models.Accounts{
@@ -95,7 +119,7 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUs
 		Location:    input.Location,
 	}
 
-	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB)
+	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
 	return usersGraphqlController.Patch(ctx, user)
 }
@@ -144,17 +168,24 @@ func (r *queryResolver) Report(ctx context.Context, id string) (*models.Reports,
 }
 
 // Users is the resolver for the users field.
-func (r *queryResolver) Users(ctx context.Context, first int, after string, filter *types.UserFilter) (*types.UserConnection, error) {
-	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB)
-	return usersGraphqlController.GetList(ctx, first, after, filter)
+func (r *queryResolver) Users(ctx context.Context, first int, after string) (*types.UserConnection, error) {
+	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
+	return usersGraphqlController.GetList(ctx, first, after)
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*models.Users, error) {
 	ids, _ := strconv.Atoi(id)
-	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB)
+	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
 	return usersGraphqlController.Get(ctx, ids)
+}
+
+// UserSearchFilters is the resolver for the user_search_filters field.
+func (r *queryResolver) UserSearchFilters(ctx context.Context) (*models.UserSearchFilters, error) {
+	userSearchFiltersGraphqlController := controllers.NewUserSearchFilterGraphqlController(r.DB, r.Jwt)
+
+	return userSearchFiltersGraphqlController.Get(ctx)
 }
 
 // VerifyEmail is the resolver for the verify_email field.

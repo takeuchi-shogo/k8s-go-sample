@@ -70,15 +70,17 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateAccount        func(childComplexity int, input *types.NewAccounts) int
-		CreateAccountAndUser func(childComplexity int, account types.NewAccounts, user types.NewUsers) int
-		CreateBlock          func(childComplexity int, input *types.NewBlocks) int
-		CreateReport         func(childComplexity int, input *types.NewReports) int
-		CreateUser           func(childComplexity int, input *types.NewUsers) int
-		CreateVerifyEmail    func(childComplexity int, input *types.NewVerifyEmails) int
-		Login                func(childComplexity int, input *types.NewLogin) int
-		UpdateAccount        func(childComplexity int, input *types.UpdateAccounts) int
-		UpdateUser           func(childComplexity int, input *types.UpdateUsers) int
+		CreateAccount           func(childComplexity int, input *types.NewAccounts) int
+		CreateAccountAndUser    func(childComplexity int, account types.NewAccounts, user types.NewUsers) int
+		CreateBlock             func(childComplexity int, input *types.NewBlocks) int
+		CreateReport            func(childComplexity int, input *types.NewReports) int
+		CreateUser              func(childComplexity int, input *types.NewUsers) int
+		CreateUserSearchFilters func(childComplexity int, input *types.NewUserSearchFilters) int
+		CreateVerifyEmail       func(childComplexity int, input *types.NewVerifyEmails) int
+		Login                   func(childComplexity int, input *types.NewLogin) int
+		UpdateAccount           func(childComplexity int, input *types.UpdateAccounts) int
+		UpdateUser              func(childComplexity int, input *types.UpdateUsers) int
+		UpdateUserSearchFilters func(childComplexity int, input *types.UpdateUserSearchFilters) int
 	}
 
 	PageInfo struct {
@@ -89,15 +91,16 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Account     func(childComplexity int, id string) int
-		Block       func(childComplexity int, id string) int
-		Blocks      func(childComplexity int) int
-		Me          func(childComplexity int) int
-		Report      func(childComplexity int, id string) int
-		Reports     func(childComplexity int) int
-		User        func(childComplexity int, id string) int
-		Users       func(childComplexity int, first int, after string, filter *types.UserFilter) int
-		VerifyEmail func(childComplexity int, code string) int
+		Account           func(childComplexity int, id string) int
+		Block             func(childComplexity int, id string) int
+		Blocks            func(childComplexity int) int
+		Me                func(childComplexity int) int
+		Report            func(childComplexity int, id string) int
+		Reports           func(childComplexity int) int
+		User              func(childComplexity int, id string) int
+		UserSearchFilters func(childComplexity int) int
+		Users             func(childComplexity int, first int, after string) int
+		VerifyEmail       func(childComplexity int, code string) int
 	}
 
 	Reports struct {
@@ -123,6 +126,13 @@ type ComplexityRoot struct {
 		Introduction func(childComplexity int) int
 		LookingFor   func(childComplexity int) int
 		UserID       func(childComplexity int) int
+	}
+
+	UserSearchFilters struct {
+		Gender   func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Location func(childComplexity int) int
+		UserID   func(childComplexity int) int
 	}
 
 	Users struct {
@@ -157,6 +167,8 @@ type MutationResolver interface {
 	CreateReport(ctx context.Context, input *types.NewReports) (*models.Reports, error)
 	Login(ctx context.Context, input *types.NewLogin) (*models.Users, error)
 	CreateUser(ctx context.Context, input *types.NewUsers) (*models.Users, error)
+	CreateUserSearchFilters(ctx context.Context, input *types.NewUserSearchFilters) (*models.UserSearchFilters, error)
+	UpdateUserSearchFilters(ctx context.Context, input *types.UpdateUserSearchFilters) (*models.UserSearchFilters, error)
 	UpdateAccount(ctx context.Context, input *types.UpdateAccounts) (*models.Accounts, error)
 	UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error)
 	CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*models.VerifyEmails, error)
@@ -168,8 +180,9 @@ type QueryResolver interface {
 	Me(ctx context.Context) (*models.Users, error)
 	Reports(ctx context.Context) ([]*models.Reports, error)
 	Report(ctx context.Context, id string) (*models.Reports, error)
-	Users(ctx context.Context, first int, after string, filter *types.UserFilter) (*types.UserConnection, error)
+	Users(ctx context.Context, first int, after string) (*types.UserConnection, error)
 	User(ctx context.Context, id string) (*models.Users, error)
+	UserSearchFilters(ctx context.Context) (*models.UserSearchFilters, error)
 	VerifyEmail(ctx context.Context, code string) (*models.VerifyEmails, error)
 }
 type UsersResolver interface {
@@ -335,6 +348,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(*types.NewUsers)), true
 
+	case "Mutation.createUserSearchFilters":
+		if e.complexity.Mutation.CreateUserSearchFilters == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createUserSearchFilters_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateUserSearchFilters(childComplexity, args["input"].(*types.NewUserSearchFilters)), true
+
 	case "Mutation.createVerifyEmail":
 		if e.complexity.Mutation.CreateVerifyEmail == nil {
 			break
@@ -383,28 +408,40 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(*types.UpdateUsers)), true
 
-	case "PageInfo.endCursor":
+	case "Mutation.updateUserSearchFilters":
+		if e.complexity.Mutation.UpdateUserSearchFilters == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUserSearchFilters_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUserSearchFilters(childComplexity, args["input"].(*types.UpdateUserSearchFilters)), true
+
+	case "PageInfo.end_cursor":
 		if e.complexity.PageInfo.EndCursor == nil {
 			break
 		}
 
 		return e.complexity.PageInfo.EndCursor(childComplexity), true
 
-	case "PageInfo.hasNextPage":
+	case "PageInfo.has_next_page":
 		if e.complexity.PageInfo.HasNextPage == nil {
 			break
 		}
 
 		return e.complexity.PageInfo.HasNextPage(childComplexity), true
 
-	case "PageInfo.hasPreviousPage":
+	case "PageInfo.has_previous_page":
 		if e.complexity.PageInfo.HasPreviousPage == nil {
 			break
 		}
 
 		return e.complexity.PageInfo.HasPreviousPage(childComplexity), true
 
-	case "PageInfo.startCursor":
+	case "PageInfo.start_cursor":
 		if e.complexity.PageInfo.StartCursor == nil {
 			break
 		}
@@ -480,6 +517,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.User(childComplexity, args["id"].(string)), true
 
+	case "Query.user_search_filters":
+		if e.complexity.Query.UserSearchFilters == nil {
+			break
+		}
+
+		return e.complexity.Query.UserSearchFilters(childComplexity), true
+
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
 			break
@@ -490,7 +534,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Users(childComplexity, args["first"].(int), args["after"].(string), args["filter"].(*types.UserFilter)), true
+		return e.complexity.Query.Users(childComplexity, args["first"].(int), args["after"].(string)), true
 
 	case "Query.verify_email":
 		if e.complexity.Query.VerifyEmail == nil {
@@ -539,7 +583,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserConnection.Edges(childComplexity), true
 
-	case "UserConnection.pageInfo":
+	case "UserConnection.page_info":
 		if e.complexity.UserConnection.PageInfo == nil {
 			break
 		}
@@ -594,6 +638,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserProfiles.UserID(childComplexity), true
+
+	case "UserSearchFilters.gender":
+		if e.complexity.UserSearchFilters.Gender == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.Gender(childComplexity), true
+
+	case "UserSearchFilters.id":
+		if e.complexity.UserSearchFilters.ID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.ID(childComplexity), true
+
+	case "UserSearchFilters.location":
+		if e.complexity.UserSearchFilters.Location == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.Location(childComplexity), true
+
+	case "UserSearchFilters.user_id":
+		if e.complexity.UserSearchFilters.UserID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.UserID(childComplexity), true
 
 	case "Users.account_id":
 		if e.complexity.Users.AccountID == nil {
@@ -705,12 +777,13 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewBlocks,
 		ec.unmarshalInputNewLogin,
 		ec.unmarshalInputNewReports,
+		ec.unmarshalInputNewUserSearchFilters,
 		ec.unmarshalInputNewUsers,
 		ec.unmarshalInputNewVerifyEmails,
 		ec.unmarshalInputUpdateAccounts,
 		ec.unmarshalInputUpdateUserProfiles,
+		ec.unmarshalInputUpdateUserSearchFilters,
 		ec.unmarshalInputUpdateUsers,
-		ec.unmarshalInputUserFilter,
 	)
 	first := true
 
@@ -859,6 +932,21 @@ func (ec *executionContext) field_Mutation_createReport_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createUserSearchFilters_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *types.NewUserSearchFilters
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalONewUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewUserSearchFilters(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -911,6 +999,21 @@ func (ec *executionContext) field_Mutation_updateAccount_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalOUpdateAccounts2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateAccounts(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUserSearchFilters_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *types.UpdateUserSearchFilters
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOUpdateUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateUserSearchFilters(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1030,15 +1133,6 @@ func (ec *executionContext) field_Query_users_args(ctx context.Context, rawArgs 
 		}
 	}
 	args["after"] = arg1
-	var arg2 *types.UserFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg2, err = ec.unmarshalOUserFilter2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUserFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["filter"] = arg2
 	return args, nil
 }
 
@@ -2045,6 +2139,134 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createUserSearchFilters(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createUserSearchFilters(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateUserSearchFilters(rctx, fc.Args["input"].(*types.NewUserSearchFilters))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.UserSearchFilters)
+	fc.Result = res
+	return ec.marshalNUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserSearchFilters(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createUserSearchFilters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserSearchFilters_id(ctx, field)
+			case "user_id":
+				return ec.fieldContext_UserSearchFilters_user_id(ctx, field)
+			case "gender":
+				return ec.fieldContext_UserSearchFilters_gender(ctx, field)
+			case "location":
+				return ec.fieldContext_UserSearchFilters_location(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserSearchFilters", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createUserSearchFilters_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateUserSearchFilters(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUserSearchFilters(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUserSearchFilters(rctx, fc.Args["input"].(*types.UpdateUserSearchFilters))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.UserSearchFilters)
+	fc.Result = res
+	return ec.marshalNUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserSearchFilters(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUserSearchFilters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserSearchFilters_id(ctx, field)
+			case "user_id":
+				return ec.fieldContext_UserSearchFilters_user_id(ctx, field)
+			case "gender":
+				return ec.fieldContext_UserSearchFilters_gender(ctx, field)
+			case "location":
+				return ec.fieldContext_UserSearchFilters_location(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserSearchFilters", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUserSearchFilters_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_updateAccount(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_updateAccount(ctx, field)
 	if err != nil {
@@ -2253,8 +2475,8 @@ func (ec *executionContext) fieldContext_Mutation_createVerifyEmail(ctx context.
 	return fc, nil
 }
 
-func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+func (ec *executionContext) _PageInfo_has_next_page(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_has_next_page(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2284,7 +2506,7 @@ func (ec *executionContext) _PageInfo_hasNextPage(ctx context.Context, field gra
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PageInfo_hasNextPage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PageInfo_has_next_page(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PageInfo",
 		Field:      field,
@@ -2297,8 +2519,8 @@ func (ec *executionContext) fieldContext_PageInfo_hasNextPage(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+func (ec *executionContext) _PageInfo_has_previous_page(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_has_previous_page(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2328,7 +2550,7 @@ func (ec *executionContext) _PageInfo_hasPreviousPage(ctx context.Context, field
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PageInfo_hasPreviousPage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PageInfo_has_previous_page(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PageInfo",
 		Field:      field,
@@ -2341,8 +2563,8 @@ func (ec *executionContext) fieldContext_PageInfo_hasPreviousPage(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PageInfo_startCursor(ctx, field)
+func (ec *executionContext) _PageInfo_start_cursor(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_start_cursor(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2369,7 +2591,7 @@ func (ec *executionContext) _PageInfo_startCursor(ctx context.Context, field gra
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PageInfo_startCursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PageInfo_start_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PageInfo",
 		Field:      field,
@@ -2382,8 +2604,8 @@ func (ec *executionContext) fieldContext_PageInfo_startCursor(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_PageInfo_endCursor(ctx, field)
+func (ec *executionContext) _PageInfo_end_cursor(ctx context.Context, field graphql.CollectedField, obj *types.PageInfo) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PageInfo_end_cursor(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2410,7 +2632,7 @@ func (ec *executionContext) _PageInfo_endCursor(ctx context.Context, field graph
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_PageInfo_endCursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_PageInfo_end_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PageInfo",
 		Field:      field,
@@ -2800,7 +3022,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Users(rctx, fc.Args["first"].(int), fc.Args["after"].(string), fc.Args["filter"].(*types.UserFilter))
+		return ec.resolvers.Query().Users(rctx, fc.Args["first"].(int), fc.Args["after"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2826,8 +3048,8 @@ func (ec *executionContext) fieldContext_Query_users(ctx context.Context, field 
 			switch field.Name {
 			case "edges":
 				return ec.fieldContext_UserConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_UserConnection_pageInfo(ctx, field)
+			case "page_info":
+				return ec.fieldContext_UserConnection_page_info(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserConnection", field.Name)
 		},
@@ -2918,6 +3140,59 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 	if fc.Args, err = ec.field_Query_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_user_search_filters(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_user_search_filters(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().UserSearchFilters(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.UserSearchFilters)
+	fc.Result = res
+	return ec.marshalNUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserSearchFilters(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_user_search_filters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserSearchFilters_id(ctx, field)
+			case "user_id":
+				return ec.fieldContext_UserSearchFilters_user_id(ctx, field)
+			case "gender":
+				return ec.fieldContext_UserSearchFilters_gender(ctx, field)
+			case "location":
+				return ec.fieldContext_UserSearchFilters_location(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserSearchFilters", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -3339,8 +3614,8 @@ func (ec *executionContext) fieldContext_UserConnection_edges(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _UserConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *types.UserConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_UserConnection_pageInfo(ctx, field)
+func (ec *executionContext) _UserConnection_page_info(ctx context.Context, field graphql.CollectedField, obj *types.UserConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserConnection_page_info(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3370,7 +3645,7 @@ func (ec *executionContext) _UserConnection_pageInfo(ctx context.Context, field 
 	return ec.marshalNPageInfo2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐPageInfo(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_UserConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_UserConnection_page_info(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UserConnection",
 		Field:      field,
@@ -3378,14 +3653,14 @@ func (ec *executionContext) fieldContext_UserConnection_pageInfo(ctx context.Con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			case "has_next_page":
+				return ec.fieldContext_PageInfo_has_next_page(ctx, field)
+			case "has_previous_page":
+				return ec.fieldContext_PageInfo_has_previous_page(ctx, field)
+			case "start_cursor":
+				return ec.fieldContext_PageInfo_start_cursor(ctx, field)
+			case "end_cursor":
+				return ec.fieldContext_PageInfo_end_cursor(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
 		},
@@ -3713,6 +3988,179 @@ func (ec *executionContext) _UserProfiles_looking_for(ctx context.Context, field
 func (ec *executionContext) fieldContext_UserProfiles_looking_for(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UserProfiles",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_user_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_user_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UserID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_user_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_gender(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_gender(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Gender, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalNString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_gender(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_location(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_location(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_location(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -6272,6 +6720,42 @@ func (ec *executionContext) unmarshalInputNewReports(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewUserSearchFilters(ctx context.Context, obj interface{}) (types.NewUserSearchFilters, error) {
+	var it types.NewUserSearchFilters
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"gender", "location"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "gender":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gender"))
+			it.Gender, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUsers(ctx context.Context, obj interface{}) (types.NewUsers, error) {
 	var it types.NewUsers
 	asMap := map[string]interface{}{}
@@ -6456,6 +6940,50 @@ func (ec *executionContext) unmarshalInputUpdateUserProfiles(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateUserSearchFilters(ctx context.Context, obj interface{}) (types.UpdateUserSearchFilters, error) {
+	var it types.UpdateUserSearchFilters
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"id", "gender", "location"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "gender":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gender"))
+			it.Gender, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "location":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
+			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj interface{}) (types.UpdateUsers, error) {
 	var it types.UpdateUsers
 	asMap := map[string]interface{}{}
@@ -6507,50 +7035,6 @@ func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj i
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
 			it.Location, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
-func (ec *executionContext) unmarshalInputUserFilter(ctx context.Context, obj interface{}) (types.UserFilter, error) {
-	var it types.UserFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	fieldsInOrder := [...]string{"age", "gender", "location"}
-	for _, k := range fieldsInOrder {
-		v, ok := asMap[k]
-		if !ok {
-			continue
-		}
-		switch k {
-		case "age":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("age"))
-			it.Age, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "gender":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gender"))
-			it.Gender, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "location":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
-			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6795,6 +7279,18 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_createUser(ctx, field)
 			})
 
+		case "createUserSearchFilters":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createUserSearchFilters(ctx, field)
+			})
+
+		case "updateUserSearchFilters":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserSearchFilters(ctx, field)
+			})
+
 		case "updateAccount":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -6831,27 +7327,27 @@ func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet,
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("PageInfo")
-		case "hasNextPage":
+		case "has_next_page":
 
-			out.Values[i] = ec._PageInfo_hasNextPage(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "hasPreviousPage":
-
-			out.Values[i] = ec._PageInfo_hasPreviousPage(ctx, field, obj)
+			out.Values[i] = ec._PageInfo_has_next_page(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "startCursor":
+		case "has_previous_page":
 
-			out.Values[i] = ec._PageInfo_startCursor(ctx, field, obj)
+			out.Values[i] = ec._PageInfo_has_previous_page(ctx, field, obj)
 
-		case "endCursor":
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "start_cursor":
 
-			out.Values[i] = ec._PageInfo_endCursor(ctx, field, obj)
+			out.Values[i] = ec._PageInfo_start_cursor(ctx, field, obj)
+
+		case "end_cursor":
+
+			out.Values[i] = ec._PageInfo_end_cursor(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -7042,6 +7538,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "user_search_filters":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_user_search_filters(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "verify_email":
 			field := field
 
@@ -7148,9 +7664,9 @@ func (ec *executionContext) _UserConnection(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "pageInfo":
+		case "page_info":
 
-			out.Values[i] = ec._UserConnection_pageInfo(ctx, field, obj)
+			out.Values[i] = ec._UserConnection_page_info(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -7246,6 +7762,52 @@ func (ec *executionContext) _UserProfiles(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userSearchFiltersImplementors = []string{"UserSearchFilters"}
+
+func (ec *executionContext) _UserSearchFilters(ctx context.Context, sel ast.SelectionSet, obj *models.UserSearchFilters) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userSearchFiltersImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserSearchFilters")
+		case "id":
+
+			out.Values[i] = ec._UserSearchFilters_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "user_id":
+
+			out.Values[i] = ec._UserSearchFilters_user_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "gender":
+
+			out.Values[i] = ec._UserSearchFilters_gender(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "location":
+
+			out.Values[i] = ec._UserSearchFilters_location(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8042,6 +8604,20 @@ func (ec *executionContext) marshalNUserEdge2ᚖgithubᚗcomᚋtakeuchiᚑshogo�
 	return ec._UserEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNUserSearchFilters2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserSearchFilters(ctx context.Context, sel ast.SelectionSet, v models.UserSearchFilters) graphql.Marshaler {
+	return ec._UserSearchFilters(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserSearchFilters(ctx context.Context, sel ast.SelectionSet, v *models.UserSearchFilters) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserSearchFilters(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNUsers2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUsers(ctx context.Context, sel ast.SelectionSet, v models.Users) graphql.Marshaler {
 	return ec._Users(ctx, sel, &v)
 }
@@ -8349,22 +8925,6 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := graphql.UnmarshalInt(v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	res := graphql.MarshalInt(*v)
-	return res
-}
-
 func (ec *executionContext) unmarshalONewAccounts2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewAccounts(ctx context.Context, v interface{}) (*types.NewAccounts, error) {
 	if v == nil {
 		return nil, nil
@@ -8394,6 +8954,14 @@ func (ec *executionContext) unmarshalONewReports2ᚖgithubᚗcomᚋtakeuchiᚑsh
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputNewReports(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONewUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewUserSearchFilters(ctx context.Context, v interface{}) (*types.NewUserSearchFilters, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewUserSearchFilters(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -8437,19 +9005,19 @@ func (ec *executionContext) unmarshalOUpdateAccounts2ᚖgithubᚗcomᚋtakeuchi�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOUpdateUserSearchFilters2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateUserSearchFilters(ctx context.Context, v interface{}) (*types.UpdateUserSearchFilters, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateUserSearchFilters(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOUpdateUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateUsers(ctx context.Context, v interface{}) (*types.UpdateUsers, error) {
 	if v == nil {
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputUpdateUsers(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOUserFilter2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUserFilter(ctx context.Context, v interface{}) (*types.UserFilter, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputUserFilter(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

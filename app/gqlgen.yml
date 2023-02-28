@@ -65,6 +65,9 @@ models:
   Users:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Users"
+  UserSearchFilters:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.UserSearchFilters"
   VerifyEmails:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.VerifyEmails"

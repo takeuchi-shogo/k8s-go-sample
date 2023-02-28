@@ -34,6 +34,11 @@ type NewReports struct {
 	Reason     string `json:"reason"`
 }
 
+type NewUserSearchFilters struct {
+	Gender   *string `json:"gender"`
+	Location *string `json:"location"`
+}
+
 type NewUsers struct {
 	DisplayName string `json:"display_name"`
 	ScreenName  string `json:"screen_name"`
@@ -45,10 +50,10 @@ type NewVerifyEmails struct {
 }
 
 type PageInfo struct {
-	HasNextPage     bool    `json:"hasNextPage"`
-	HasPreviousPage bool    `json:"hasPreviousPage"`
-	StartCursor     *string `json:"startCursor"`
-	EndCursor       *string `json:"endCursor"`
+	HasNextPage     bool    `json:"has_next_page"`
+	HasPreviousPage bool    `json:"has_previous_page"`
+	StartCursor     *string `json:"start_cursor"`
+	EndCursor       *string `json:"end_cursor"`
 }
 
 type UpdateAccounts struct {
@@ -66,6 +71,12 @@ type UpdateUserProfiles struct {
 	LookingFor   string `json:"looking_for"`
 }
 
+type UpdateUserSearchFilters struct {
+	ID       string  `json:"id"`
+	Gender   *string `json:"gender"`
+	Location *string `json:"location"`
+}
+
 type UpdateUsers struct {
 	ID          int    `json:"id"`
 	DisplayName string `json:"display_name"`
@@ -76,16 +87,10 @@ type UpdateUsers struct {
 
 type UserConnection struct {
 	Edges    []*UserEdge `json:"edges"`
-	PageInfo *PageInfo   `json:"pageInfo"`
+	PageInfo *PageInfo   `json:"page_info"`
 }
 
 type UserEdge struct {
 	Cursor string        `json:"cursor"`
 	Node   *models.Users `json:"node"`
-}
-
-type UserFilter struct {
-	Age      *int    `json:"age"`
-	Gender   *string `json:"gender"`
-	Location *string `json:"location"`
 }

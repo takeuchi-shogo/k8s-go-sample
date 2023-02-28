@@ -13,19 +13,22 @@ import (
 )
 
 type UserInteractor struct {
-	AccountRepository     repository.AccountRepository
-	DBRepository          repository.DBRepository
-	UserRepository        repository.UserRepository
-	UserPresenter         presenter.UserPresenter
-	VerifyEmailRepository repository.VerifyEmailRepository
+	AccountRepository          repository.AccountRepository
+	DBRepository               repository.DBRepository
+	UserRepository             repository.UserRepository
+	UserPresenter              presenter.UserPresenter
+	UserSearchFilterRepository repository.UserSearchFilterRepository
+	VerifyEmailRepository      repository.VerifyEmailRepository
 }
 
 func getCursor(user *models.Users) string {
 	return strconv.Itoa(user.ID)
 }
 
-func (interactor *UserInteractor) GetList(first int, after string, filter *types.UserFilter) (*types.UserConnection, *services.ResultStatus) {
+func (interactor *UserInteractor) GetList(first int, after string, userID int) (*types.UserConnection, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
+
+	filter, _ := interactor.UserSearchFilterRepository.FirstByUserID(db, userID)
 
 	users, err := interactor.UserRepository.FindByUserFilter(db, filter, first+1, after)
 	if err != nil {

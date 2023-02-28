@@ -32,10 +32,10 @@ type Reports {
 }
 
 type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
+  has_next_page: Boolean!
+  has_previous_page: Boolean!
+  start_cursor: String
+  end_cursor: String
 }
 
 type UserProfiles {
@@ -48,7 +48,7 @@ type UserProfiles {
 
 type UserConnection {
   edges: [UserEdge!]!
-  pageInfo: PageInfo!
+  page_info: PageInfo!
 }
 
 type UserEdge {
@@ -56,9 +56,10 @@ type UserEdge {
   node: Users!
 }
 
-input UserFilter {
-  age: Int
-  gender: String
+type UserSearchFilters {
+  id: ID!
+  user_id: Int!
+  gender: String!
   location: String
 }
 
@@ -94,9 +95,11 @@ type Query {
   reports: [Reports!]!
   report(id: ID!): Reports!
 
-  users(first: Int!, after: String!, filter: UserFilter): UserConnection!
+  users(first: Int!, after: String!): UserConnection!
   # users: [Users!]!
   user(id: ID!): Users!
+
+  user_search_filters: UserSearchFilters!
 
   verify_email(code: String!): VerifyEmails!
 }
@@ -128,6 +131,17 @@ input NewUsers {
   display_name: String!
   screen_name: String!
   gender: String!
+}
+
+input NewUserSearchFilters {
+  gender: String
+  location: String
+}
+
+input UpdateUserSearchFilters {
+  id: ID!
+  gender: String
+  location: String
 }
 
 input UpdateAccounts {
@@ -165,6 +179,8 @@ type Mutation {
   createReport(input: NewReports): Reports!
   login(input: NewLogin): Users!
   createUser(input: NewUsers): Users!
+  createUserSearchFilters(input: NewUserSearchFilters): UserSearchFilters!
+  updateUserSearchFilters(input: UpdateUserSearchFilters): UserSearchFilters!
   updateAccount(input: UpdateAccounts): Accounts!
   updateUser(input: UpdateUsers): Users!
   createVerifyEmail(input: NewVerifyEmails): VerifyEmails!

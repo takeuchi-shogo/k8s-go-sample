@@ -8,6 +8,7 @@ import (
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/repository"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/services"
 	"github.com/takeuchi-shogo/k8s-go-sample/utils"
+	"gorm.io/gorm"
 )
 
 type AccountInteractor struct {
@@ -45,6 +46,20 @@ func (interactor *AccountInteractor) Create(a *models.Accounts, token string) (*
 		return &models.Accounts{}, services.NewResultStatus(http.StatusBadRequest, err)
 	}
 	return account, services.NewResultStatus(http.StatusOK, nil)
+}
+
+func (interactor *AccountInteractor) setVelue(db *gorm.DB) string {
+	var value string
+
+	for {
+		value = utils.RandomScreenName()
+		if _, err := interactor.UserRepository.FirstByScreenName(db, value); err != nil {
+			// 見つからなければfor文を抜ける
+			break
+		}
+	}
+
+	return value
 }
 
 func (interactor *AccountInteractor) Signup(account *models.Accounts, user *models.Users) (*models.Users, *services.ResultStatus) {

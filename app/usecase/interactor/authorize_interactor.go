@@ -35,7 +35,7 @@ func (interactor *AuthorizeInteractor) Verify(token string) (int, *services.Resu
 
 	// check token
 	if isTokenExpire(int64(claims["exp"].(float64))) {
-		return 0, services.NewResultStatus(http.StatusUnauthorized, err)
+		return 0, services.NewResultStatus(http.StatusUnauthorized, errors.New("有効期限が切れています"))
 	}
 
 	userID, _ := strconv.Atoi(claims["aud"].(string))

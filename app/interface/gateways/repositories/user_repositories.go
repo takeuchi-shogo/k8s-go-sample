@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
-	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"gorm.io/gorm"
 )
 
@@ -20,16 +19,16 @@ func (repo *UserRepository) Find(db *gorm.DB) ([]*models.Users, error) {
 	return users, nil
 }
 
-func (repo *UserRepository) FindByUserFilter(db *gorm.DB, filter *types.UserFilter, limit int, after string) ([]*models.Users, error) {
+func (repo *UserRepository) FindByUserFilter(db *gorm.DB, filter *models.UserSearchFilters, limit int, after string) ([]*models.Users, error) {
 	users := []*models.Users{}
 
 	query := db.Order("created_at desc")
 
 	if filter != nil {
-		if *filter.Gender != "" {
+		if filter.Gender != nil {
 			query = query.Where("gender = ?", *filter.Gender)
 		}
-		if *filter.Location != "" {
+		if filter.Location != nil {
 			query = query.Where("location = ?", *filter.Location)
 		}
 	}
