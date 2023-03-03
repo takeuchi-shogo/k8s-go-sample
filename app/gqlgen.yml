@@ -56,6 +56,9 @@ models:
   Blocks:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Blocks"
+  Likes:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Likes"
   Reports:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Reports"

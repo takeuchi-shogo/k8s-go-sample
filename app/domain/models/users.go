@@ -6,6 +6,7 @@ type Users struct {
 	AccountID        int    `json:"account_id"`
 	DisplayName      string `json:"display_name"`
 	ScreenName       string `json:"screen_name"`
+	Age              int    `json:"age"`
 	Gender           string `json:"gender"`
 	Location         string `json:"location"`
 	IsAuthorizeEmail bool   `json:"is_authorize_email"`

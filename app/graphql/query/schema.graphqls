@@ -18,6 +18,13 @@ type Blocks {
   blocked: Int!
 }
 
+type Likes {
+  id: ID!
+  send_user_id: Int!
+  receive_user_id: Int!
+  created_at: Int!
+}
+
 type Matches {
   id: ID!
   male_user_id: Int!
@@ -116,6 +123,10 @@ input NewBlocks {
   blocked: Int!
 }
 
+input NewLikes {
+  receive_user_id: Int!
+}
+
 input NewLogin {
   email: String!
   password: String!
@@ -176,6 +187,7 @@ type Mutation {
   createAccount(input: NewAccounts): Accounts!
   createAccountAndUser(account: NewAccounts!, user: NewUsers!): Users!
   createBlock(input: NewBlocks): Blocks!
+  createLike(input: NewLikes): Likes!
   createReport(input: NewReports): Reports!
   login(input: NewLogin): Users!
   createUser(input: NewUsers): Users!

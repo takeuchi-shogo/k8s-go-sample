@@ -24,6 +24,26 @@ func (r *accountsResolver) AccessLevel(ctx context.Context, obj *models.Accounts
 	panic(fmt.Errorf("not implemented: AccessLevel - access_level"))
 }
 
+// Blocking is the resolver for the blocking field.
+func (r *blocksResolver) Blocking(ctx context.Context, obj *models.Blocks) (int, error) {
+	panic(fmt.Errorf("not implemented: Blocking - blocking"))
+}
+
+// Blocked is the resolver for the blocked field.
+func (r *blocksResolver) Blocked(ctx context.Context, obj *models.Blocks) (int, error) {
+	panic(fmt.Errorf("not implemented: Blocked - blocked"))
+}
+
+// SendUserID is the resolver for the send_user_id field.
+func (r *likesResolver) SendUserID(ctx context.Context, obj *models.Likes) (int, error) {
+	panic(fmt.Errorf("not implemented: SendUserID - send_user_id"))
+}
+
+// ReceiveUserID is the resolver for the receive_user_id field.
+func (r *likesResolver) ReceiveUserID(ctx context.Context, obj *models.Likes) (int, error) {
+	panic(fmt.Errorf("not implemented: ReceiveUserID - receive_user_id"))
+}
+
 // CreateAccount is the resolver for the createAccount field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input *types.NewAccounts) (*models.Accounts, error) {
 	a := &models.Accounts{
@@ -52,6 +72,16 @@ func (r *mutationResolver) CreateAccountAndUser(ctx context.Context, account typ
 // CreateBlock is the resolver for the createBlock field.
 func (r *mutationResolver) CreateBlock(ctx context.Context, input *types.NewBlocks) (*models.Blocks, error) {
 	panic(fmt.Errorf("not implemented: CreateBlock - createBlock"))
+}
+
+// CreateLike is the resolver for the createLike field.
+func (r *mutationResolver) CreateLike(ctx context.Context, input *types.NewLikes) (*models.Likes, error) {
+	like := &models.Likes{
+		ReceiveUserID: input.ReceiveUserID,
+	}
+	likesGraphqlController := controllers.NewLikesGraphqlController(r.DB, r.Jwt)
+
+	return likesGraphqlController.Post(ctx, like)
 }
 
 // CreateReport is the resolver for the createReport field.
@@ -203,6 +233,12 @@ func (r *usersResolver) IsVerifiedEmail(ctx context.Context, obj *models.Users) 
 // Accounts returns AccountsResolver implementation.
 func (r *Resolver) Accounts() AccountsResolver { return &accountsResolver{r} }
 
+// Blocks returns BlocksResolver implementation.
+func (r *Resolver) Blocks() BlocksResolver { return &blocksResolver{r} }
+
+// Likes returns LikesResolver implementation.
+func (r *Resolver) Likes() LikesResolver { return &likesResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -213,6 +249,8 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 func (r *Resolver) Users() UsersResolver { return &usersResolver{r} }
 
 type accountsResolver struct{ *Resolver }
+type blocksResolver struct{ *Resolver }
+type likesResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type usersResolver struct{ *Resolver }

@@ -1,6 +1,8 @@
 package interactor
 
 import (
+	"time"
+
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/repository"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/services"
@@ -38,7 +40,9 @@ func (interactor *UserSearchFilterInteractor) Save(filter *models.UserSearchFilt
 		return &models.UserSearchFilters{}, services.NewResultStatus(400, err)
 	}
 
-	f = filter
+	f.Gender = filter.Gender
+	f.Location = filter.Location
+	f.UpdatedAt = time.Now().Unix()
 
 	updatedFilter, err := interactor.UserSearchFilter.Save(db, f)
 	if err != nil {

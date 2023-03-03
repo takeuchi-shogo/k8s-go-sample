@@ -23,6 +23,10 @@ type NewBlocks struct {
 	Blocked  int `json:"blocked"`
 }
 
+type NewLikes struct {
+	ReceiveUserID int `json:"receive_user_id"`
+}
+
 type NewLogin struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`

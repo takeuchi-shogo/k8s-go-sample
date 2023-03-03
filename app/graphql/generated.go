@@ -39,6 +39,8 @@ type Config struct {
 
 type ResolverRoot interface {
 	Accounts() AccountsResolver
+	Blocks() BlocksResolver
+	Likes() LikesResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Users() UsersResolver
@@ -63,6 +65,13 @@ type ComplexityRoot struct {
 		ID       func(childComplexity int) int
 	}
 
+	Likes struct {
+		CreatedAt     func(childComplexity int) int
+		ID            func(childComplexity int) int
+		ReceiveUserID func(childComplexity int) int
+		SendUserID    func(childComplexity int) int
+	}
+
 	Matches struct {
 		FemaleUserID func(childComplexity int) int
 		ID           func(childComplexity int) int
@@ -73,6 +82,7 @@ type ComplexityRoot struct {
 		CreateAccount           func(childComplexity int, input *types.NewAccounts) int
 		CreateAccountAndUser    func(childComplexity int, account types.NewAccounts, user types.NewUsers) int
 		CreateBlock             func(childComplexity int, input *types.NewBlocks) int
+		CreateLike              func(childComplexity int, input *types.NewLikes) int
 		CreateReport            func(childComplexity int, input *types.NewReports) int
 		CreateUser              func(childComplexity int, input *types.NewUsers) int
 		CreateUserSearchFilters func(childComplexity int, input *types.NewUserSearchFilters) int
@@ -160,10 +170,19 @@ type AccountsResolver interface {
 	LoginStatus(ctx context.Context, obj *models.Accounts) (bool, error)
 	AccessLevel(ctx context.Context, obj *models.Accounts) (string, error)
 }
+type BlocksResolver interface {
+	Blocking(ctx context.Context, obj *models.Blocks) (int, error)
+	Blocked(ctx context.Context, obj *models.Blocks) (int, error)
+}
+type LikesResolver interface {
+	SendUserID(ctx context.Context, obj *models.Likes) (int, error)
+	ReceiveUserID(ctx context.Context, obj *models.Likes) (int, error)
+}
 type MutationResolver interface {
 	CreateAccount(ctx context.Context, input *types.NewAccounts) (*models.Accounts, error)
 	CreateAccountAndUser(ctx context.Context, account types.NewAccounts, user types.NewUsers) (*models.Users, error)
 	CreateBlock(ctx context.Context, input *types.NewBlocks) (*models.Blocks, error)
+	CreateLike(ctx context.Context, input *types.NewLikes) (*models.Likes, error)
 	CreateReport(ctx context.Context, input *types.NewReports) (*models.Reports, error)
 	Login(ctx context.Context, input *types.NewLogin) (*models.Users, error)
 	CreateUser(ctx context.Context, input *types.NewUsers) (*models.Users, error)
@@ -267,6 +286,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Blocks.ID(childComplexity), true
 
+	case "Likes.created_at":
+		if e.complexity.Likes.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Likes.CreatedAt(childComplexity), true
+
+	case "Likes.id":
+		if e.complexity.Likes.ID == nil {
+			break
+		}
+
+		return e.complexity.Likes.ID(childComplexity), true
+
+	case "Likes.receive_user_id":
+		if e.complexity.Likes.ReceiveUserID == nil {
+			break
+		}
+
+		return e.complexity.Likes.ReceiveUserID(childComplexity), true
+
+	case "Likes.send_user_id":
+		if e.complexity.Likes.SendUserID == nil {
+			break
+		}
+
+		return e.complexity.Likes.SendUserID(childComplexity), true
+
 	case "Matches.female_user_id":
 		if e.complexity.Matches.FemaleUserID == nil {
 			break
@@ -323,6 +370,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateBlock(childComplexity, args["input"].(*types.NewBlocks)), true
+
+	case "Mutation.createLike":
+		if e.complexity.Mutation.CreateLike == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createLike_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateLike(childComplexity, args["input"].(*types.NewLikes)), true
 
 	case "Mutation.createReport":
 		if e.complexity.Mutation.CreateReport == nil {
@@ -775,6 +834,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewAccounts,
 		ec.unmarshalInputNewBlocks,
+		ec.unmarshalInputNewLikes,
 		ec.unmarshalInputNewLogin,
 		ec.unmarshalInputNewReports,
 		ec.unmarshalInputNewUserSearchFilters,
@@ -909,6 +969,21 @@ func (ec *executionContext) field_Mutation_createBlock_args(ctx context.Context,
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalONewBlocks2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewBlocks(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createLike_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *types.NewLikes
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalONewLikes2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewLikes(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1511,7 +1586,7 @@ func (ec *executionContext) _Blocks_blocking(ctx context.Context, field graphql.
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Blocking, nil
+		return ec.resolvers.Blocks().Blocking(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1532,8 +1607,8 @@ func (ec *executionContext) fieldContext_Blocks_blocking(ctx context.Context, fi
 	fc = &graphql.FieldContext{
 		Object:     "Blocks",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -1555,7 +1630,7 @@ func (ec *executionContext) _Blocks_blocked(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Blocked, nil
+		return ec.resolvers.Blocks().Blocked(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1575,6 +1650,182 @@ func (ec *executionContext) _Blocks_blocked(ctx context.Context, field graphql.C
 func (ec *executionContext) fieldContext_Blocks_blocked(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Blocks",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Likes_id(ctx context.Context, field graphql.CollectedField, obj *models.Likes) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Likes_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Likes_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Likes",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Likes_send_user_id(ctx context.Context, field graphql.CollectedField, obj *models.Likes) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Likes_send_user_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Likes().SendUserID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Likes_send_user_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Likes",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Likes_receive_user_id(ctx context.Context, field graphql.CollectedField, obj *models.Likes) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Likes_receive_user_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Likes().ReceiveUserID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Likes_receive_user_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Likes",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Likes_created_at(ctx context.Context, field graphql.CollectedField, obj *models.Likes) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Likes_created_at(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int64)
+	fc.Result = res
+	return ec.marshalNInt2int64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Likes_created_at(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Likes",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -1917,6 +2168,70 @@ func (ec *executionContext) fieldContext_Mutation_createBlock(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createBlock_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createLike(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createLike(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateLike(rctx, fc.Args["input"].(*types.NewLikes))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.Likes)
+	fc.Result = res
+	return ec.marshalNLikes2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐLikes(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createLike(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Likes_id(ctx, field)
+			case "send_user_id":
+				return ec.fieldContext_Likes_send_user_id(ctx, field)
+			case "receive_user_id":
+				return ec.fieldContext_Likes_receive_user_id(ctx, field)
+			case "created_at":
+				return ec.fieldContext_Likes_created_at(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Likes", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createLike_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3546,9 +3861,9 @@ func (ec *executionContext) _Reports_reason(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Reports_reason(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6640,6 +6955,34 @@ func (ec *executionContext) unmarshalInputNewBlocks(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewLikes(ctx context.Context, obj interface{}) (types.NewLikes, error) {
+	var it types.NewLikes
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"receive_user_id"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "receive_user_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receive_user_id"))
+			it.ReceiveUserID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewLogin(ctx context.Context, obj interface{}) (types.NewLogin, error) {
 	var it types.NewLogin
 	asMap := map[string]interface{}{}
@@ -7156,21 +7499,122 @@ func (ec *executionContext) _Blocks(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec._Blocks_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "blocking":
+			field := field
 
-			out.Values[i] = ec._Blocks_blocking(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Blocks_blocking(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
-		case "blocked":
 
-			out.Values[i] = ec._Blocks_blocked(ctx, field, obj)
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "blocked":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Blocks_blocked(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var likesImplementors = []string{"Likes"}
+
+func (ec *executionContext) _Likes(ctx context.Context, sel ast.SelectionSet, obj *models.Likes) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, likesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Likes")
+		case "id":
+
+			out.Values[i] = ec._Likes_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "send_user_id":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Likes_send_user_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "receive_user_id":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Likes_receive_user_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "created_at":
+
+			out.Values[i] = ec._Likes_created_at(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -7259,6 +7703,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createBlock(ctx, field)
+			})
+
+		case "createLike":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createLike(ctx, field)
 			})
 
 		case "createReport":
@@ -8422,6 +8872,35 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int64(ctx context.Context, v interface{}) (int64, error) {
+	res, err := graphql.UnmarshalInt64(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
+	res := graphql.MarshalInt64(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) marshalNLikes2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐLikes(ctx context.Context, sel ast.SelectionSet, v models.Likes) graphql.Marshaler {
+	return ec._Likes(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNLikes2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐLikes(ctx context.Context, sel ast.SelectionSet, v *models.Likes) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Likes(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNNewAccounts2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewAccounts(ctx context.Context, v interface{}) (types.NewAccounts, error) {
 	res, err := ec.unmarshalInputNewAccounts(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -8938,6 +9417,14 @@ func (ec *executionContext) unmarshalONewBlocks2ᚖgithubᚗcomᚋtakeuchiᚑsho
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputNewBlocks(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalONewLikes2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewLikes(ctx context.Context, v interface{}) (*types.NewLikes, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewLikes(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

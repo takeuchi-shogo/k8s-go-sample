@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `user_profiles` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`user_id`  int UNSIGNED NOT NULL,
+	`user_id` int UNSIGNED NOT NULL,
 	`introduction` varchar(255) NULL,
 	`interests` varchar(255) NULL,
 	`looking_for` varchar(255) NULL,
