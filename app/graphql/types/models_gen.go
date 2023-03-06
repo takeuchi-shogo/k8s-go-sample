@@ -95,6 +95,6 @@ type UserConnection struct {
 }
 
 type UserEdge struct {
-	Cursor string        `json:"cursor"`
-	Node   *models.Users `json:"node"`
+	Cursor string                `json:"cursor"`
+	Node   *models.ResponseUsers `json:"node"`
 }

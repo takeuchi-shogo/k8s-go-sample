@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+	"github.com/takeuchi-shogo/k8s-go-sample/usecase/gateway"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/repository"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/services"
 	"github.com/takeuchi-shogo/k8s-go-sample/utils"
@@ -12,11 +13,13 @@ import (
 )
 
 type AccountInteractor struct {
-	AccountRepository     repository.AccountRepository
-	DBRepository          repository.DBRepository
-	UserRepository        repository.UserRepository
-	UserProfileRepository repository.UserProfileRepository
-	VerifyEmailRepository repository.VerifyEmailRepository
+	AccountRepository          repository.AccountRepository
+	DBRepository               repository.DBRepository
+	Jwt                        gateway.JwtGateway
+	UserRepository             repository.UserRepository
+	UserProfileRepository      repository.UserProfileRepository
+	UserSearchFilterRepository repository.UserSearchFilterRepository
+	VerifyEmailRepository      repository.VerifyEmailRepository
 
 	// AccountPresenter presenter.AccountPresenter
 }
@@ -62,7 +65,7 @@ func (interactor *AccountInteractor) setVelue(db *gorm.DB) string {
 	return value
 }
 
-func (interactor *AccountInteractor) Signup(account *models.Accounts, user *models.Users) (*models.Users, *services.ResultStatus) {
+func (interactor *AccountInteractor) Signup(account *models.Accounts, user *models.Users) (*models.Users, string, *services.ResultStatus) {
 	db := interactor.DBRepository.Begin()
 
 	account.PhoneNumber = "000000"
@@ -76,7 +79,7 @@ func (interactor *AccountInteractor) Signup(account *models.Accounts, user *mode
 	createdAccount, err := interactor.AccountRepository.Create(db, account)
 	if err != nil {
 		db.Rollback()
-		return &models.Users{}, services.NewResultStatus(http.StatusBadRequest, err)
+		return &models.Users{}, "", services.NewResultStatus(http.StatusBadRequest, err)
 	}
 
 	user.AccountID = createdAccount.ID
@@ -90,7 +93,22 @@ func (interactor *AccountInteractor) Signup(account *models.Accounts, user *mode
 	createdUser, err := interactor.UserRepository.Create(db, user)
 	if err != nil {
 		db.Rollback()
-		return &models.Users{}, services.NewResultStatus(http.StatusBadRequest, err)
+		return &models.Users{}, "", services.NewResultStatus(http.StatusBadRequest, err)
+	}
+	gender := ""
+
+	switch createdUser.Gender {
+	case "M":
+		gender = "F"
+	case "F":
+		gender = "M"
+	}
+	if _, err := interactor.UserSearchFilterRepository.Create(db, &models.UserSearchFilters{
+		UserID: createdUser.ID,
+		Gender: &gender,
+	}); err != nil {
+		db.Rollback()
+		return &models.Users{}, "", services.NewResultStatus(http.StatusBadRequest, err)
 	}
 
 	if _, err := interactor.UserProfileRepository.Create(db, &models.UserProfiles{
@@ -99,11 +117,13 @@ func (interactor *AccountInteractor) Signup(account *models.Accounts, user *mode
 		UpdatedAt: currentTime,
 	}); err != nil {
 		db.Rollback()
-		return &models.Users{}, services.NewResultStatus(http.StatusBadRequest, err)
+		return &models.Users{}, "", services.NewResultStatus(http.StatusBadRequest, err)
 	}
 
+	jwtToken := interactor.Jwt.CreateToken(createdUser.ID)
+
 	db.Commit()
-	return createdUser, services.NewResultStatus(http.StatusOK, nil)
+	return createdUser, jwtToken, services.NewResultStatus(http.StatusOK, nil)
 }
 
 func (interactor *AccountInteractor) Save(a *models.Accounts) (*models.Accounts, *services.ResultStatus) {

@@ -48,9 +48,40 @@ type PageInfo {
 type UserProfiles {
   id: ID!
   user_id: Int!
-  introduction: String!
-  interests: String!
-  looking_for: String!
+	introduction: String!
+
+	height_id: Int!
+	body_type_id: Int!
+	blood_type_id: Int!
+	residence_id: Int!
+	hometown_id: Int!
+	occupation_id: Int!
+	education_id: Int!
+	annual_income_id: Int!
+	smoking_id: Int!
+	drinking_id: Int!
+
+	siblings_id: Int!
+	language_id: Int!
+	interests_id: Int!
+	looking_for_id: Int!
+
+	school_name: String!
+	job_title: String!
+
+	marital_history_id: Int!
+	presence_of_children_id: Int!
+	intentions_towards_marriage_id: Int!
+	desire_for_children_id: Int!
+	household_chores_and_child_rearing_id: Int!
+	indeal_first_encointer_id: Int!
+	dating_expenses_id: Int!
+
+	presonality_type_id: Int!
+	sociability_id: Int!
+	roommates_id: Int!
+	days_off_id: Int!
+	hobbies_id: Int!
 }
 
 type UserConnection {
@@ -60,7 +91,7 @@ type UserConnection {
 
 type UserEdge {
   cursor: String!
-  node: Users!
+  node: ResponseUsers!
 }
 
 type UserSearchFilters {
@@ -97,14 +128,14 @@ type Query {
   blocks: [Blocks!]!
   block(id: ID!): Blocks!
 
-  me: Users!
+  me: ResponseUsers!
 
   reports: [Reports!]!
   report(id: ID!): Reports!
 
   users(first: Int!, after: String!): UserConnection!
   # users: [Users!]!
-  user(id: ID!): Users!
+  user(id: ID!): ResponseUsers!
 
   user_search_filters: UserSearchFilters!
 

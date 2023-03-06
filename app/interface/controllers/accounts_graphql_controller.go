@@ -25,9 +25,12 @@ func NewAccountsGraphqlController(db repositories.DB, jwt gateways.Jwt) *Account
 			UserRepository:    &repositories.UserRepository{},
 		},
 		Interactor: interactor.AccountInteractor{
-			AccountRepository: &repositories.AccountRepository{},
-			DBRepository:      &repositories.DBRepository{DB: db},
-			UserRepository:    &repositories.UserRepository{},
+			AccountRepository:          &repositories.AccountRepository{},
+			DBRepository:               &repositories.DBRepository{DB: db},
+			Jwt:                        &gateways.JwtGateway{Jwt: jwt},
+			UserProfileRepository:      &repositories.UserProfileRepository{},
+			UserRepository:             &repositories.UserRepository{},
+			UserSearchFilterRepository: &repositories.UserSearchFilterRepository{},
 
 			VerifyEmailRepository: &repositories.VerifyEmailRepository{},
 		},
@@ -68,12 +71,12 @@ func (controller *AccountsGraphqlController) Post(
 		return nil, err
 	}
 	// Account自体は返さない
-	createdUser, res := controller.Interactor.Signup(account, user)
+	createdUser, jwtToken, res := controller.Interactor.Signup(account, user)
 	if res.Error != nil {
 		return createdUser, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
 
-	gc.Header("Authorization", "Bearer "+"jwt")
+	gc.Header("Authorization", "Bearer "+jwtToken)
 	return createdUser, nil
 }
 

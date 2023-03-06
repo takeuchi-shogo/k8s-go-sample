@@ -30,9 +30,11 @@ func NewUsersGraphqlController(db repositories.DB, jwt gateways.Jwt) *UsersGraph
 			AccountRepository:          &repositories.AccountRepository{},
 			DBRepository:               &repositories.DBRepository{DB: db},
 			UserRepository:             &repositories.UserRepository{},
+			UserProfileRepository:      &repositories.UserProfileRepository{},
 			UserSearchFilterRepository: &repositories.UserSearchFilterRepository{},
 			UserPresenter:              &presenters.UsersPresenter{},
 			VerifyEmailRepository:      &repositories.VerifyEmailRepository{},
+			UserProfilePresenter:       &presenters.UserPriflesPresenter{},
 		},
 	}
 }
@@ -66,7 +68,7 @@ func (controller *UsersGraphqlController) GetList(ctx context.Context, first int
 	return users, nil
 }
 
-func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*models.Users, error) {
+func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*models.ResponseUsers, error) {
 	user, res := controller.Interactor.Get(id)
 	if res.Error != nil {
 		return user, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)

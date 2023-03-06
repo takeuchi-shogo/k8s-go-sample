@@ -35,7 +35,7 @@ func NewMeGraphqlController(db repositories.DB, jwt gateways.Jwt) *MeGraphqlCont
 	}
 }
 
-func (controller *MeGraphqlController) Get(ctx context.Context) (*models.Users, error) {
+func (controller *MeGraphqlController) Get(ctx context.Context) (*models.ResponseUsers, error) {
 
 	gc, err := helpers.GinContextFromContext(ctx)
 	if err != nil {
