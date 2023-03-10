@@ -105,9 +105,11 @@ func (r *mutationResolver) CreateUserSearchFilters(ctx context.Context, input *t
 func (r *mutationResolver) UpdateUserSearchFilters(ctx context.Context, input *types.UpdateUserSearchFilters) (*models.UserSearchFilters, error) {
 	id, _ := strconv.Atoi(input.ID)
 	usf := &models.UserSearchFilters{
-		ID:       id,
-		Gender:   input.Gender,
-		Location: input.Location,
+		ID:     id,
+		Gender: input.Gender,
+		// Location: input.Location,
+		BodyTypeID:  input.BodyTypeID,
+		BloodTypeID: input.BloodTypeID,
 	}
 	userSearchFiltersGraphqlController := controllers.NewUserSearchFilterGraphqlController(r.DB, r.Jwt)
 
@@ -131,16 +133,29 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, input *types.Updat
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error) {
 	user := &models.Users{
-		ID:          input.ID,
+		// ID:          input.ID,
 		DisplayName: input.DisplayName,
-		ScreenName:  input.ScreenName,
-		Gender:      input.Gender,
-		Location:    input.Location,
+		// ScreenName:  input.ScreenName,
+		Gender:   input.Gender,
+		Age:      input.Age,
+		Location: input.Location,
 	}
 
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
 	return usersGraphqlController.Patch(ctx, user)
+}
+
+// UpdateUserProfile is the resolver for the updateUserProfile field.
+func (r *mutationResolver) UpdateUserProfile(ctx context.Context, input *types.UpdateUserProfiles) (*models.UserProfiles, error) {
+	id, _ := strconv.Atoi(input.ID)
+	profile := &models.UserProfiles{
+		ID: id,
+		// UserID:     input.UserID,
+		BodyTypeID: input.BodyTypeID,
+	}
+	userProfilesGraphqlController := controllers.NewUserProfilesGraphqlController(r.DB)
+	return userProfilesGraphqlController.Patch(ctx, profile)
 }
 
 // CreateVerifyEmail is the resolver for the createVerifyEmail field.
@@ -212,6 +227,16 @@ func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*models.V
 	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
 
 	return verifyEmailsGraphqlController.Get(ctx, code)
+}
+
+// ResidenceID is the resolver for the residence_id field.
+func (r *userProfilesResolver) ResidenceID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: ResidenceID - residence_id"))
+}
+
+// HometownID is the resolver for the hometown_id field.
+func (r *userProfilesResolver) HometownID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: HometownID - hometown_id"))
 }
 
 // IndealFirstEncointerID is the resolver for the indeal_first_encointer_id field.

@@ -68,24 +68,30 @@ type UpdateAccounts struct {
 }
 
 type UpdateUserProfiles struct {
-	ID           string `json:"id"`
-	UserID       int    `json:"user_id"`
-	Introduction string `json:"introduction"`
-	Interests    string `json:"interests"`
-	LookingFor   string `json:"looking_for"`
+	ID         string `json:"id"`
+	BodyTypeID int    `json:"body_type_id"`
 }
 
 type UpdateUserSearchFilters struct {
-	ID       string  `json:"id"`
-	Gender   *string `json:"gender"`
-	Location *string `json:"location"`
+	ID              string  `json:"id"`
+	Gender          *string `json:"gender"`
+	Location        *string `json:"location"`
+	Purpose         int     `json:"purpose"`
+	HasIntroduction bool    `json:"has_introduction"`
+	HeightID        int     `json:"height_id"`
+	BodyTypeID      int     `json:"body_type_id"`
+	BloodTypeID     int     `json:"blood_type_id"`
+	OccupationID    int     `json:"occupation_id"`
+	EducationID     int     `json:"education_id"`
+	AnnualIncomeID  int     `json:"annual_income_id"`
+	SmokingID       int     `json:"smoking_id"`
+	DrinkingID      int     `json:"drinking_id"`
 }
 
 type UpdateUsers struct {
-	ID          int    `json:"id"`
 	DisplayName string `json:"display_name"`
-	ScreenName  string `json:"screen_name"`
 	Gender      string `json:"gender"`
+	Age         int    `json:"age"`
 	Location    string `json:"location"`
 }
 

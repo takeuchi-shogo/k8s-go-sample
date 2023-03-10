@@ -41,18 +41,18 @@ func NewUsersController(p UsersControllerProvider) *usersController {
 }
 
 func (controller *usersController) Get(c helpers.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, helpers.NewResponseError(http.StatusBadRequest, err, err.Error()))
-		return
-	}
+	// id, err := strconv.Atoi(c.Param("id"))
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, helpers.NewResponseError(http.StatusBadRequest, err, err.Error()))
+	// 	return
+	// }
 
-	user, res := controller.Interactor.Get(id)
-	if res.Error != nil {
-		c.JSON(res.Code, helpers.NewResponseError(res.Code, res.Error, res.Error.Error()))
-		return
-	}
-	c.JSON(res.Code, helpers.NewResponseSuccess("success", user))
+	// user, res := controller.Interactor.Get(id)
+	// if res.Error != nil {
+	// 	c.JSON(res.Code, helpers.NewResponseError(res.Code, res.Error, res.Error.Error()))
+	// 	return
+	// }
+	// c.JSON(res.Code, helpers.NewResponseSuccess("success", user))
 }
 
 func (controller *usersController) Post(c helpers.Context) {

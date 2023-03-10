@@ -3,18 +3,21 @@ package models
 type UserProfiles struct {
 	ID           int     `json:"id"`
 	UserID       int     `json:"user_id"`
+	Purpose      int     `json:"purpose"`
 	Introduction *string `json:"introduction"`
 	// Basic Profile
-	HeightID       int `json:"height_id"`
-	BodyTypeID     int `json:"body_type_id"`
-	BloodTypeID    int `json:"blood_type_id"`
-	ResidenceID    int `json:"residence_id"`
-	HometownID     int `json:"hometown_id"`
-	OccupationID   int `json:"occupation_id"`
-	EducationID    int `json:"education_id"`
-	AnnualIncomeID int `json:"annual_income_id"`
-	SmokingID      int `json:"smoking_id"`
-	DrinkingID     int `json:"drinking_id"`
+	HeightID           int `json:"height_id"`
+	BodyTypeID         int `json:"body_type_id"`
+	BloodTypeID        int `json:"blood_type_id"`
+	ResidenceCountryID int `json:"residence_country_id"`
+	ResidenceStateID   int `json:"residence_state_id"`
+	HometownCountryID  int `json:"hometown_country_id"`
+	HometownStateID    int `json:"hometown_state_id"`
+	OccupationID       int `json:"occupation_id"`
+	EducationID        int `json:"education_id"`
+	AnnualIncomeID     int `json:"annual_income_id"`
+	SmokingID          int `json:"smoking_id"`
+	DrinkingID         int `json:"drinking_id"`
 	// User Information
 	// Nickname
 	// Age
@@ -47,6 +50,7 @@ type UserProfiles struct {
 
 type ResponseUserProfiles struct {
 	UserID       int     `json:"user_id"`
+	Purpose      int     `json:"purpose"`
 	Introduction *string `json:"introduction"`
 	// Interests    *string `json:"interests"`
 	// LookingFor   *string `json:"looking_for"`

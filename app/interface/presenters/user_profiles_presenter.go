@@ -12,24 +12,37 @@ func NewUserProfilesPresenter() presenter.UserProfilePresenter {
 	return &UserPriflesPresenter{}
 }
 
-func (up *UserPriflesPresenter) ResponseUserProfile(profile *models.ResponseUserProfiles) *models.ResponseUserProfiles {
-	profile = setBasicProfile(profile)
+func (up *UserPriflesPresenter) ResponseUserProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
+	profile := setBasicProfile(p)
 	return profile
 }
 
-func setBasicProfile(p *models.ResponseUserProfiles) *models.ResponseUserProfiles {
-	p.Height = setHeight(p.HeightID)
-	p.BodyType = setBodyType(p.BodyTypeID)
-	p.BloodType = setBloodType(p.BloodTypeID)
-	p.ResidenceCountry, p.ResidenceState = setResidence(p.ResidenceCountryID, p.ResidenceStateID)
-	p.HometownCountry, p.HometownState = setHometown(p.HometownCountryID, p.HometownStateID)
-	p.Occupation = setOccupation(p.OccupationID)
-	p.Education = setEducation(p.EducationID)
-	p.AnnualIncome = setAnnualIncome(p.AnnualIncomeID)
-	p.Smoking = setSmoking(p.SmokingID)
-	p.Drinking = setDrinking(p.DrinkingID)
-
-	return p
+func setBasicProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
+	profile := &models.ResponseUserProfiles{
+		HeightID:           p.HeightID,
+		BodyTypeID:         p.BodyTypeID,
+		BloodTypeID:        p.BloodTypeID,
+		ResidenceCountryID: p.ResidenceCountryID,
+		ResidenceStateID:   p.ResidenceStateID,
+		HometownCountryID:  p.HometownCountryID,
+		HometownStateID:    p.HometownStateID,
+		OccupationID:       p.OccupationID,
+		EducationID:        p.EducationID,
+		AnnualIncomeID:     p.AnnualIncomeID,
+		SmokingID:          p.SmokingID,
+		DrinkingID:         p.DrinkingID,
+	}
+	profile.Height = setHeight(p.HeightID)
+	profile.BodyType = setBodyType(p.BodyTypeID)
+	profile.BloodType = setBloodType(p.BloodTypeID)
+	profile.ResidenceCountry, profile.ResidenceState = setResidence(p.ResidenceCountryID, p.ResidenceStateID)
+	profile.HometownCountry, profile.HometownState = setHometown(p.HometownCountryID, p.HometownStateID)
+	profile.Occupation = setOccupation(p.OccupationID)
+	profile.Education = setEducation(p.EducationID)
+	profile.AnnualIncome = setAnnualIncome(p.AnnualIncomeID)
+	profile.Smoking = setSmoking(p.SmokingID)
+	profile.Drinking = setDrinking(p.DrinkingID)
+	return profile
 }
 
 func setHeight(id int) string {
@@ -115,6 +128,52 @@ func setState(countryID, stateID int) string {
 }
 
 func setPrefecture(id int) string {
+	switch id {
+	case 1:
+		return "北海道"
+	case 2:
+		return "青森県"
+	case 3:
+		return "岩手県"
+	case 4:
+		return "宮城県"
+	case 5:
+		return "秋田県"
+	case 6:
+		return "山形県"
+	case 7:
+		return "福島県"
+	case 8:
+		return "茨城県"
+	case 9:
+		return "栃木県"
+	case 10:
+		return "群馬県"
+	case 11:
+		return "埼玉県"
+	case 12:
+		return "千葉県"
+	case 13:
+		return "東京都"
+	case 14:
+		return "神奈川県"
+	case 15:
+		return "新潟県"
+	case 16:
+		return "富山県"
+	case 17:
+		return "石川県"
+	case 18:
+		return "福井県"
+	case 19:
+		return "山梨県"
+	case 20:
+		return "長野県"
+	case 21:
+		return "岐阜県"
+	case 22:
+		return "静岡県"
+	}
 	return ""
 }
 

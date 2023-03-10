@@ -11,10 +11,11 @@ import (
 )
 
 type AccountGraphqlInteractor struct {
-	Account     repository.AccountRepository
-	DB          repository.DBRepository
-	User        repository.UserRepository
-	UserProfile repository.UserProfileRepository
+	Account          repository.AccountRepository
+	DB               repository.DBRepository
+	User             repository.UserRepository
+	UserProfile      repository.UserProfileRepository
+	UserSearchFilter repository.UserSearchFilterRepository
 }
 
 func (interactor *AccountGraphqlInteractor) Signup(account *models.Accounts, user *models.Users) (*models.Users, *services.ResultStatus) {
@@ -50,6 +51,13 @@ func (interactor *AccountGraphqlInteractor) Signup(account *models.Accounts, use
 	}
 
 	if _, err := interactor.UserProfile.Create(db, &models.UserProfiles{
+		UserID: createdUser.ID,
+	}); err != nil {
+		db.Rollback()
+		return &models.Users{}, services.NewResultStatus(http.StatusBadRequest, err)
+	}
+
+	if _, err := interactor.UserSearchFilter.Create(db, &models.UserSearchFilters{
 		UserID: createdUser.ID,
 	}); err != nil {
 		db.Rollback()

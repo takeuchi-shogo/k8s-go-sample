@@ -36,7 +36,14 @@ func (interactor *UserProfileInteractor) Create(p *models.UserProfiles) (*models
 func (interactor *UserProfileInteractor) Save(up *models.UserProfiles) (*models.UserProfiles, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
 
-	profile, err := interactor.UserProfileRepository.Save(db, up)
+	foundProfile, err := interactor.UserProfileRepository.FindByID(db, up.ID)
+	if err != nil {
+		return &models.UserProfiles{}, services.NewResultStatus(http.StatusBadRequest, err)
+	}
+
+	foundProfile.BodyTypeID = up.BodyTypeID
+
+	profile, err := interactor.UserProfileRepository.Save(db, foundProfile)
 	if err != nil {
 		return &models.UserProfiles{}, services.NewResultStatus(http.StatusBadRequest, err)
 	}

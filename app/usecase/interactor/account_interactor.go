@@ -26,7 +26,6 @@ type AccountInteractor struct {
 
 func (interactor *AccountInteractor) Get(id int) (*models.Accounts, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
-
 	account, err := interactor.AccountRepository.FindByID(db, id)
 	if err != nil {
 		return &models.Accounts{}, services.NewResultStatus(http.StatusBadRequest, err)

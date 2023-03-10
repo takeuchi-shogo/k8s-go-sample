@@ -91,6 +91,7 @@ type ComplexityRoot struct {
 		Login                   func(childComplexity int, input *types.NewLogin) int
 		UpdateAccount           func(childComplexity int, input *types.UpdateAccounts) int
 		UpdateUser              func(childComplexity int, input *types.UpdateUsers) int
+		UpdateUserProfile       func(childComplexity int, input *types.UpdateUserProfiles) int
 		UpdateUserSearchFilters func(childComplexity int, input *types.UpdateUserSearchFilters) int
 	}
 
@@ -241,14 +242,25 @@ type ComplexityRoot struct {
 	}
 
 	UserSearchFilters struct {
-		Gender   func(childComplexity int) int
-		ID       func(childComplexity int) int
-		Location func(childComplexity int) int
-		UserID   func(childComplexity int) int
+		AnnualIncomeID  func(childComplexity int) int
+		BloodTypeID     func(childComplexity int) int
+		BodyTypeID      func(childComplexity int) int
+		DrinkingID      func(childComplexity int) int
+		EducationID     func(childComplexity int) int
+		Gender          func(childComplexity int) int
+		HasIntroduction func(childComplexity int) int
+		HeightID        func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Location        func(childComplexity int) int
+		OccupationID    func(childComplexity int) int
+		Purpose         func(childComplexity int) int
+		SmokingID       func(childComplexity int) int
+		UserID          func(childComplexity int) int
 	}
 
 	Users struct {
 		AccountID        func(childComplexity int) int
+		Age              func(childComplexity int) int
 		DisplayName      func(childComplexity int) int
 		Gender           func(childComplexity int) int
 		ID               func(childComplexity int) int
@@ -288,6 +300,7 @@ type MutationResolver interface {
 	UpdateUserSearchFilters(ctx context.Context, input *types.UpdateUserSearchFilters) (*models.UserSearchFilters, error)
 	UpdateAccount(ctx context.Context, input *types.UpdateAccounts) (*models.Accounts, error)
 	UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error)
+	UpdateUserProfile(ctx context.Context, input *types.UpdateUserProfiles) (*models.UserProfiles, error)
 	CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*models.VerifyEmails, error)
 }
 type QueryResolver interface {
@@ -310,6 +323,9 @@ type ResponseUserProfilesResolver interface {
 	PresonalityType(ctx context.Context, obj *models.ResponseUserProfiles) (string, error)
 }
 type UserProfilesResolver interface {
+	ResidenceID(ctx context.Context, obj *models.UserProfiles) (int, error)
+	HometownID(ctx context.Context, obj *models.UserProfiles) (int, error)
+
 	IndealFirstEncointerID(ctx context.Context, obj *models.UserProfiles) (int, error)
 
 	PresonalityTypeID(ctx context.Context, obj *models.UserProfiles) (int, error)
@@ -576,6 +592,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateUser(childComplexity, args["input"].(*types.UpdateUsers)), true
+
+	case "Mutation.updateUserProfile":
+		if e.complexity.Mutation.UpdateUserProfile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateUserProfile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateUserProfile(childComplexity, args["input"].(*types.UpdateUserProfiles)), true
 
 	case "Mutation.updateUserSearchFilters":
 		if e.complexity.Mutation.UpdateUserSearchFilters == nil {
@@ -1473,12 +1501,61 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserProfiles.UserID(childComplexity), true
 
+	case "UserSearchFilters.annual_income_id":
+		if e.complexity.UserSearchFilters.AnnualIncomeID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.AnnualIncomeID(childComplexity), true
+
+	case "UserSearchFilters.blood_type_id":
+		if e.complexity.UserSearchFilters.BloodTypeID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.BloodTypeID(childComplexity), true
+
+	case "UserSearchFilters.body_type_id":
+		if e.complexity.UserSearchFilters.BodyTypeID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.BodyTypeID(childComplexity), true
+
+	case "UserSearchFilters.drinking_id":
+		if e.complexity.UserSearchFilters.DrinkingID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.DrinkingID(childComplexity), true
+
+	case "UserSearchFilters.education_id":
+		if e.complexity.UserSearchFilters.EducationID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.EducationID(childComplexity), true
+
 	case "UserSearchFilters.gender":
 		if e.complexity.UserSearchFilters.Gender == nil {
 			break
 		}
 
 		return e.complexity.UserSearchFilters.Gender(childComplexity), true
+
+	case "UserSearchFilters.has_introduction":
+		if e.complexity.UserSearchFilters.HasIntroduction == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.HasIntroduction(childComplexity), true
+
+	case "UserSearchFilters.height_id":
+		if e.complexity.UserSearchFilters.HeightID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.HeightID(childComplexity), true
 
 	case "UserSearchFilters.id":
 		if e.complexity.UserSearchFilters.ID == nil {
@@ -1494,6 +1571,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.UserSearchFilters.Location(childComplexity), true
 
+	case "UserSearchFilters.occupation_id":
+		if e.complexity.UserSearchFilters.OccupationID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.OccupationID(childComplexity), true
+
+	case "UserSearchFilters.purpose":
+		if e.complexity.UserSearchFilters.Purpose == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.Purpose(childComplexity), true
+
+	case "UserSearchFilters.smoking_id":
+		if e.complexity.UserSearchFilters.SmokingID == nil {
+			break
+		}
+
+		return e.complexity.UserSearchFilters.SmokingID(childComplexity), true
+
 	case "UserSearchFilters.user_id":
 		if e.complexity.UserSearchFilters.UserID == nil {
 			break
@@ -1507,6 +1605,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Users.AccountID(childComplexity), true
+
+	case "Users.age":
+		if e.complexity.Users.Age == nil {
+			break
+		}
+
+		return e.complexity.Users.Age(childComplexity), true
 
 	case "Users.display_name":
 		if e.complexity.Users.DisplayName == nil {
@@ -1850,6 +1955,21 @@ func (ec *executionContext) field_Mutation_updateAccount_args(ctx context.Contex
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalOUpdateAccounts2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateAccounts(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateUserProfile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *types.UpdateUserProfiles
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOUpdateUserProfiles2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateUserProfiles(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2862,6 +2982,8 @@ func (ec *executionContext) fieldContext_Mutation_createAccountAndUser(ctx conte
 				return ec.fieldContext_Users_screen_name(ctx, field)
 			case "gender":
 				return ec.fieldContext_Users_gender(ctx, field)
+			case "age":
+				return ec.fieldContext_Users_age(ctx, field)
 			case "location":
 				return ec.fieldContext_Users_location(ctx, field)
 			case "is_authorize_email":
@@ -3128,6 +3250,8 @@ func (ec *executionContext) fieldContext_Mutation_login(ctx context.Context, fie
 				return ec.fieldContext_Users_screen_name(ctx, field)
 			case "gender":
 				return ec.fieldContext_Users_gender(ctx, field)
+			case "age":
+				return ec.fieldContext_Users_age(ctx, field)
 			case "location":
 				return ec.fieldContext_Users_location(ctx, field)
 			case "is_authorize_email":
@@ -3204,6 +3328,8 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_Users_screen_name(ctx, field)
 			case "gender":
 				return ec.fieldContext_Users_gender(ctx, field)
+			case "age":
+				return ec.fieldContext_Users_age(ctx, field)
 			case "location":
 				return ec.fieldContext_Users_location(ctx, field)
 			case "is_authorize_email":
@@ -3276,6 +3402,26 @@ func (ec *executionContext) fieldContext_Mutation_createUserSearchFilters(ctx co
 				return ec.fieldContext_UserSearchFilters_gender(ctx, field)
 			case "location":
 				return ec.fieldContext_UserSearchFilters_location(ctx, field)
+			case "purpose":
+				return ec.fieldContext_UserSearchFilters_purpose(ctx, field)
+			case "has_introduction":
+				return ec.fieldContext_UserSearchFilters_has_introduction(ctx, field)
+			case "height_id":
+				return ec.fieldContext_UserSearchFilters_height_id(ctx, field)
+			case "body_type_id":
+				return ec.fieldContext_UserSearchFilters_body_type_id(ctx, field)
+			case "blood_type_id":
+				return ec.fieldContext_UserSearchFilters_blood_type_id(ctx, field)
+			case "occupation_id":
+				return ec.fieldContext_UserSearchFilters_occupation_id(ctx, field)
+			case "education_id":
+				return ec.fieldContext_UserSearchFilters_education_id(ctx, field)
+			case "annual_income_id":
+				return ec.fieldContext_UserSearchFilters_annual_income_id(ctx, field)
+			case "smoking_id":
+				return ec.fieldContext_UserSearchFilters_smoking_id(ctx, field)
+			case "drinking_id":
+				return ec.fieldContext_UserSearchFilters_drinking_id(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserSearchFilters", field.Name)
 		},
@@ -3340,6 +3486,26 @@ func (ec *executionContext) fieldContext_Mutation_updateUserSearchFilters(ctx co
 				return ec.fieldContext_UserSearchFilters_gender(ctx, field)
 			case "location":
 				return ec.fieldContext_UserSearchFilters_location(ctx, field)
+			case "purpose":
+				return ec.fieldContext_UserSearchFilters_purpose(ctx, field)
+			case "has_introduction":
+				return ec.fieldContext_UserSearchFilters_has_introduction(ctx, field)
+			case "height_id":
+				return ec.fieldContext_UserSearchFilters_height_id(ctx, field)
+			case "body_type_id":
+				return ec.fieldContext_UserSearchFilters_body_type_id(ctx, field)
+			case "blood_type_id":
+				return ec.fieldContext_UserSearchFilters_blood_type_id(ctx, field)
+			case "occupation_id":
+				return ec.fieldContext_UserSearchFilters_occupation_id(ctx, field)
+			case "education_id":
+				return ec.fieldContext_UserSearchFilters_education_id(ctx, field)
+			case "annual_income_id":
+				return ec.fieldContext_UserSearchFilters_annual_income_id(ctx, field)
+			case "smoking_id":
+				return ec.fieldContext_UserSearchFilters_smoking_id(ctx, field)
+			case "drinking_id":
+				return ec.fieldContext_UserSearchFilters_drinking_id(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserSearchFilters", field.Name)
 		},
@@ -3476,6 +3642,8 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_Users_screen_name(ctx, field)
 			case "gender":
 				return ec.fieldContext_Users_gender(ctx, field)
+			case "age":
+				return ec.fieldContext_Users_age(ctx, field)
 			case "location":
 				return ec.fieldContext_Users_location(ctx, field)
 			case "is_authorize_email":
@@ -3496,6 +3664,124 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateUserProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateUserProfile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateUserProfile(rctx, fc.Args["input"].(*types.UpdateUserProfiles))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*models.UserProfiles)
+	fc.Result = res
+	return ec.marshalNUserProfiles2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserProfiles(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateUserProfile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserProfiles_id(ctx, field)
+			case "user_id":
+				return ec.fieldContext_UserProfiles_user_id(ctx, field)
+			case "introduction":
+				return ec.fieldContext_UserProfiles_introduction(ctx, field)
+			case "height_id":
+				return ec.fieldContext_UserProfiles_height_id(ctx, field)
+			case "body_type_id":
+				return ec.fieldContext_UserProfiles_body_type_id(ctx, field)
+			case "blood_type_id":
+				return ec.fieldContext_UserProfiles_blood_type_id(ctx, field)
+			case "residence_id":
+				return ec.fieldContext_UserProfiles_residence_id(ctx, field)
+			case "hometown_id":
+				return ec.fieldContext_UserProfiles_hometown_id(ctx, field)
+			case "occupation_id":
+				return ec.fieldContext_UserProfiles_occupation_id(ctx, field)
+			case "education_id":
+				return ec.fieldContext_UserProfiles_education_id(ctx, field)
+			case "annual_income_id":
+				return ec.fieldContext_UserProfiles_annual_income_id(ctx, field)
+			case "smoking_id":
+				return ec.fieldContext_UserProfiles_smoking_id(ctx, field)
+			case "drinking_id":
+				return ec.fieldContext_UserProfiles_drinking_id(ctx, field)
+			case "siblings_id":
+				return ec.fieldContext_UserProfiles_siblings_id(ctx, field)
+			case "language_id":
+				return ec.fieldContext_UserProfiles_language_id(ctx, field)
+			case "interests_id":
+				return ec.fieldContext_UserProfiles_interests_id(ctx, field)
+			case "looking_for_id":
+				return ec.fieldContext_UserProfiles_looking_for_id(ctx, field)
+			case "school_name":
+				return ec.fieldContext_UserProfiles_school_name(ctx, field)
+			case "job_title":
+				return ec.fieldContext_UserProfiles_job_title(ctx, field)
+			case "marital_history_id":
+				return ec.fieldContext_UserProfiles_marital_history_id(ctx, field)
+			case "presence_of_children_id":
+				return ec.fieldContext_UserProfiles_presence_of_children_id(ctx, field)
+			case "intentions_towards_marriage_id":
+				return ec.fieldContext_UserProfiles_intentions_towards_marriage_id(ctx, field)
+			case "desire_for_children_id":
+				return ec.fieldContext_UserProfiles_desire_for_children_id(ctx, field)
+			case "household_chores_and_child_rearing_id":
+				return ec.fieldContext_UserProfiles_household_chores_and_child_rearing_id(ctx, field)
+			case "indeal_first_encointer_id":
+				return ec.fieldContext_UserProfiles_indeal_first_encointer_id(ctx, field)
+			case "dating_expenses_id":
+				return ec.fieldContext_UserProfiles_dating_expenses_id(ctx, field)
+			case "presonality_type_id":
+				return ec.fieldContext_UserProfiles_presonality_type_id(ctx, field)
+			case "sociability_id":
+				return ec.fieldContext_UserProfiles_sociability_id(ctx, field)
+			case "roommates_id":
+				return ec.fieldContext_UserProfiles_roommates_id(ctx, field)
+			case "days_off_id":
+				return ec.fieldContext_UserProfiles_days_off_id(ctx, field)
+			case "hobbies_id":
+				return ec.fieldContext_UserProfiles_hobbies_id(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserProfiles", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateUserProfile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4277,6 +4563,26 @@ func (ec *executionContext) fieldContext_Query_user_search_filters(ctx context.C
 				return ec.fieldContext_UserSearchFilters_gender(ctx, field)
 			case "location":
 				return ec.fieldContext_UserSearchFilters_location(ctx, field)
+			case "purpose":
+				return ec.fieldContext_UserSearchFilters_purpose(ctx, field)
+			case "has_introduction":
+				return ec.fieldContext_UserSearchFilters_has_introduction(ctx, field)
+			case "height_id":
+				return ec.fieldContext_UserSearchFilters_height_id(ctx, field)
+			case "body_type_id":
+				return ec.fieldContext_UserSearchFilters_body_type_id(ctx, field)
+			case "blood_type_id":
+				return ec.fieldContext_UserSearchFilters_blood_type_id(ctx, field)
+			case "occupation_id":
+				return ec.fieldContext_UserSearchFilters_occupation_id(ctx, field)
+			case "education_id":
+				return ec.fieldContext_UserSearchFilters_education_id(ctx, field)
+			case "annual_income_id":
+				return ec.fieldContext_UserSearchFilters_annual_income_id(ctx, field)
+			case "smoking_id":
+				return ec.fieldContext_UserSearchFilters_smoking_id(ctx, field)
+			case "drinking_id":
+				return ec.fieldContext_UserSearchFilters_drinking_id(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserSearchFilters", field.Name)
 		},
@@ -8293,7 +8599,7 @@ func (ec *executionContext) _UserProfiles_residence_id(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ResidenceID, nil
+		return ec.resolvers.UserProfiles().ResidenceID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8314,8 +8620,8 @@ func (ec *executionContext) fieldContext_UserProfiles_residence_id(ctx context.C
 	fc = &graphql.FieldContext{
 		Object:     "UserProfiles",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -8337,7 +8643,7 @@ func (ec *executionContext) _UserProfiles_hometown_id(ctx context.Context, field
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.HometownID, nil
+		return ec.resolvers.UserProfiles().HometownID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8358,8 +8664,8 @@ func (ec *executionContext) fieldContext_UserProfiles_hometown_id(ctx context.Co
 	fc = &graphql.FieldContext{
 		Object:     "UserProfiles",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -9552,6 +9858,446 @@ func (ec *executionContext) fieldContext_UserSearchFilters_location(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _UserSearchFilters_purpose(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_purpose(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Purpose, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_purpose(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_has_introduction(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_has_introduction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HasIntroduction, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_has_introduction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_height_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_height_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HeightID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_height_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_body_type_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_body_type_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BodyTypeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_body_type_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_blood_type_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_blood_type_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.BloodTypeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_blood_type_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_occupation_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_occupation_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OccupationID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_occupation_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_education_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_education_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EducationID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_education_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_annual_income_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_annual_income_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AnnualIncomeID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_annual_income_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_smoking_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_smoking_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SmokingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_smoking_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserSearchFilters_drinking_id(ctx context.Context, field graphql.CollectedField, obj *models.UserSearchFilters) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserSearchFilters_drinking_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DrinkingID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserSearchFilters_drinking_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserSearchFilters",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Users_id(ctx context.Context, field graphql.CollectedField, obj *models.Users) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Users_id(ctx, field)
 	if err != nil {
@@ -9811,6 +10557,50 @@ func (ec *executionContext) fieldContext_Users_gender(ctx context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Users_age(ctx context.Context, field graphql.CollectedField, obj *models.Users) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Users_age(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Age, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Users_age(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Users",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -12296,7 +13086,7 @@ func (ec *executionContext) unmarshalInputUpdateUserProfiles(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "user_id", "introduction", "interests", "looking_for"}
+	fieldsInOrder := [...]string{"id", "body_type_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12311,35 +13101,11 @@ func (ec *executionContext) unmarshalInputUpdateUserProfiles(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "user_id":
+		case "body_type_id":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("user_id"))
-			it.UserID, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "introduction":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("introduction"))
-			it.Introduction, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "interests":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interests"))
-			it.Interests, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "looking_for":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("looking_for"))
-			it.LookingFor, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("body_type_id"))
+			it.BodyTypeID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12356,7 +13122,7 @@ func (ec *executionContext) unmarshalInputUpdateUserSearchFilters(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "gender", "location"}
+	fieldsInOrder := [...]string{"id", "gender", "location", "purpose", "has_introduction", "height_id", "body_type_id", "blood_type_id", "occupation_id", "education_id", "annual_income_id", "smoking_id", "drinking_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12387,6 +13153,86 @@ func (ec *executionContext) unmarshalInputUpdateUserSearchFilters(ctx context.Co
 			if err != nil {
 				return it, err
 			}
+		case "purpose":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("purpose"))
+			it.Purpose, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "has_introduction":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("has_introduction"))
+			it.HasIntroduction, err = ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "height_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("height_id"))
+			it.HeightID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "body_type_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("body_type_id"))
+			it.BodyTypeID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "blood_type_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blood_type_id"))
+			it.BloodTypeID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "occupation_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("occupation_id"))
+			it.OccupationID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "education_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("education_id"))
+			it.EducationID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "annual_income_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("annual_income_id"))
+			it.AnnualIncomeID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "smoking_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("smoking_id"))
+			it.SmokingID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "drinking_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drinking_id"))
+			it.DrinkingID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -12400,21 +13246,13 @@ func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "display_name", "screen_name", "gender", "location"}
+	fieldsInOrder := [...]string{"display_name", "gender", "age", "location"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalNInt2int(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "display_name":
 			var err error
 
@@ -12423,19 +13261,19 @@ func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj i
 			if err != nil {
 				return it, err
 			}
-		case "screen_name":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("screen_name"))
-			it.ScreenName, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "gender":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gender"))
 			it.Gender, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "age":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("age"))
+			it.Age, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12791,6 +13629,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateUser(ctx, field)
+			})
+
+		case "updateUserProfile":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateUserProfile(ctx, field)
 			})
 
 		case "createVerifyEmail":
@@ -13831,19 +14675,45 @@ func (ec *executionContext) _UserProfiles(ctx context.Context, sel ast.Selection
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "residence_id":
+			field := field
 
-			out.Values[i] = ec._UserProfiles_residence_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserProfiles_residence_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "hometown_id":
+			field := field
 
-			out.Values[i] = ec._UserProfiles_hometown_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserProfiles_hometown_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "occupation_id":
 
 			out.Values[i] = ec._UserProfiles_occupation_id(ctx, field, obj)
@@ -14077,6 +14947,76 @@ func (ec *executionContext) _UserSearchFilters(ctx context.Context, sel ast.Sele
 
 			out.Values[i] = ec._UserSearchFilters_location(ctx, field, obj)
 
+		case "purpose":
+
+			out.Values[i] = ec._UserSearchFilters_purpose(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "has_introduction":
+
+			out.Values[i] = ec._UserSearchFilters_has_introduction(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "height_id":
+
+			out.Values[i] = ec._UserSearchFilters_height_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "body_type_id":
+
+			out.Values[i] = ec._UserSearchFilters_body_type_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "blood_type_id":
+
+			out.Values[i] = ec._UserSearchFilters_blood_type_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "occupation_id":
+
+			out.Values[i] = ec._UserSearchFilters_occupation_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "education_id":
+
+			out.Values[i] = ec._UserSearchFilters_education_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "annual_income_id":
+
+			out.Values[i] = ec._UserSearchFilters_annual_income_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "smoking_id":
+
+			out.Values[i] = ec._UserSearchFilters_smoking_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "drinking_id":
+
+			out.Values[i] = ec._UserSearchFilters_drinking_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -14136,6 +15076,13 @@ func (ec *executionContext) _Users(ctx context.Context, sel ast.SelectionSet, ob
 		case "gender":
 
 			out.Values[i] = ec._Users_gender(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "age":
+
+			out.Values[i] = ec._Users_age(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -14926,6 +15873,20 @@ func (ec *executionContext) marshalNUserEdge2ᚖgithubᚗcomᚋtakeuchiᚑshogo�
 	return ec._UserEdge(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNUserProfiles2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserProfiles(ctx context.Context, sel ast.SelectionSet, v models.UserProfiles) graphql.Marshaler {
+	return ec._UserProfiles(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserProfiles2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserProfiles(ctx context.Context, sel ast.SelectionSet, v *models.UserProfiles) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserProfiles(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNUserSearchFilters2githubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUserSearchFilters(ctx context.Context, sel ast.SelectionSet, v models.UserSearchFilters) graphql.Marshaler {
 	return ec._UserSearchFilters(ctx, sel, &v)
 }
@@ -15342,6 +16303,14 @@ func (ec *executionContext) unmarshalOUpdateAccounts2ᚖgithubᚗcomᚋtakeuchi�
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputUpdateAccounts(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOUpdateUserProfiles2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐUpdateUserProfiles(ctx context.Context, v interface{}) (*types.UpdateUserProfiles, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputUpdateUserProfiles(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
