@@ -152,7 +152,8 @@ func (r *mutationResolver) UpdateUserProfile(ctx context.Context, input *types.U
 	profile := &models.UserProfiles{
 		ID: id,
 		// UserID:     input.UserID,
-		BodyTypeID: input.BodyTypeID,
+		Introduction: input.Introduction,
+		BodyTypeID:   input.BodyTypeID,
 	}
 	userProfilesGraphqlController := controllers.NewUserProfilesGraphqlController(r.DB)
 	return userProfilesGraphqlController.Patch(ctx, profile)

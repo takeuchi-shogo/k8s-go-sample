@@ -48,6 +48,7 @@ func (interactor *UserInteractor) GetList(first int, after string, userID int) (
 		ru.DisplayName = user.DisplayName
 		ru.ScreenName = user.ScreenName
 		ru.Gender = user.Gender
+		ru.Age = user.Age
 
 		builtProfile := interactor.UserProfilePresenter.ResponseUserProfile(profile)
 
@@ -106,6 +107,7 @@ func (interactor *UserInteractor) Get(id, userID int) (*models.ResponseUsers, *s
 	builtProfile := interactor.UserProfilePresenter.ResponseUserProfile(profile)
 
 	ru.UserProfile = builtProfile
+
 	return ru, services.NewResultStatus(http.StatusOK, nil)
 }
 

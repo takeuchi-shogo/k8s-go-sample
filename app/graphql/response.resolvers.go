@@ -11,6 +11,11 @@ import (
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 )
 
+// Purpose is the resolver for the purpose field.
+func (r *responseUserProfilesResolver) Purpose(ctx context.Context, obj *models.ResponseUserProfiles) (*string, error) {
+	panic(fmt.Errorf("not implemented: Purpose - purpose"))
+}
+
 // IndealFirstEncointerID is the resolver for the indeal_first_encointer_id field.
 func (r *responseUserProfilesResolver) IndealFirstEncointerID(ctx context.Context, obj *models.ResponseUserProfiles) (int, error) {
 	panic(fmt.Errorf("not implemented: IndealFirstEncointerID - indeal_first_encointer_id"))

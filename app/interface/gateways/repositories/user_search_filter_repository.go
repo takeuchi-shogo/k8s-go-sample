@@ -28,6 +28,7 @@ func (repo *UserSearchFilterRepository) FirstByUserID(db *gorm.DB, userID int) (
 
 func (repo *UserSearchFilterRepository) Create(db *gorm.DB, filter *models.UserSearchFilters) (*models.UserSearchFilters, error) {
 	// filter := &models.UserSearchFilters{}
+	fmt.Println("*************")
 	if err := db.Create(filter).Error; !errors.Is(err, nil) {
 		return nil, fmt.Errorf("failed create filter: %w", err)
 	}

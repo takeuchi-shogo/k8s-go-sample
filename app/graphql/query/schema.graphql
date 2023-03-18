@@ -235,18 +235,18 @@ input UpdateUsers {
 input UpdateUserProfiles {
   id: ID!
   # user_id: Int!
-	# introduction: String!
+	introduction: String
 
 	# height_id: Int!
 	body_type_id: Int!
-	# blood_type_id: Int!
+	blood_type_id: Int!
 	# residence_id: Int!
 	# hometown_id: Int!
-	# occupation_id: Int!
-	# education_id: Int!
-	# annual_income_id: Int!
-	# smoking_id: Int!
-	# drinking_id: Int!
+	occupation_id: Int!
+	education_id: Int!
+	annual_income_id: Int!
+	smoking_id: Int!
+	drinking_id: Int!
 
 	# siblings_id: Int!
 	# language_id: Int!

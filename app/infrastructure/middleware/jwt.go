@@ -49,6 +49,9 @@ func (j *Jwt) CreateToken(userID int) string {
 	return tokenString
 }
 
+// Create refreshToken
+//.....
+
 // Parse json web token
 func (j *Jwt) ParseToken(jwtToken string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(jwtToken, func(token *jwt.Token) (interface{}, error) {

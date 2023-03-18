@@ -28,14 +28,15 @@ func main() {
 	femaleLocations := []string{"青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県"}
 
 	interactor := interactor.AccountInteractor{
-		AccountRepository:     &repositories.AccountRepository{},
-		DBRepository:          &repositories.DBRepository{DB: db},
-		Jwt:                   &gateways.JwtGateway{Jwt: jwt},
-		UserRepository:        &repositories.UserRepository{},
-		UserProfileRepository: &repositories.UserProfileRepository{},
+		AccountRepository:          &repositories.AccountRepository{},
+		DBRepository:               &repositories.DBRepository{DB: db},
+		Jwt:                        &gateways.JwtGateway{Jwt: jwt},
+		UserRepository:             &repositories.UserRepository{},
+		UserProfileRepository:      &repositories.UserProfileRepository{},
+		UserSearchFilterRepository: &repositories.UserSearchFilterRepository{},
 	}
 	// Male
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 20; i++ {
 		account := &models.Accounts{
 			PhoneNumber: "00000000000",
 			Email:       "test_" + strconv.Itoa(i) + "@exaple.com",
@@ -52,17 +53,17 @@ func main() {
 	}
 
 	// Female
-	for i := 2; i < 4; i++ {
+	for i := 20; i < 40; i++ {
 		account := &models.Accounts{
 			PhoneNumber: "00000000000",
 			Email:       "test_" + strconv.Itoa(i) + "@exaple.com",
 			Password:    "okokok",
 		}
 		user := &models.Users{
-			DisplayName: femaleNames[i-2],
-			Age:         femaleAges[i],
+			DisplayName: femaleNames[i-20],
+			Age:         femaleAges[i-20],
 			Gender:      "F",
-			Location:    femaleLocations[i-2],
+			Location:    femaleLocations[i-20],
 		}
 		_, _, err := interactor.Signup(account, user)
 		fmt.Println(i, err)

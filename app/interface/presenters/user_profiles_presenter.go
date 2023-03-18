@@ -19,6 +19,7 @@ func (up *UserPriflesPresenter) ResponseUserProfile(p *models.UserProfiles) *mod
 
 func setBasicProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
 	profile := &models.ResponseUserProfiles{
+		Introduction:       p.Introduction,
 		HeightID:           p.HeightID,
 		BodyTypeID:         p.BodyTypeID,
 		BloodTypeID:        p.BloodTypeID,

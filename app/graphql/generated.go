@@ -169,6 +169,7 @@ type ComplexityRoot struct {
 		PresenceOfChildrenID             func(childComplexity int) int
 		PresonalityType                  func(childComplexity int) int
 		PresonalityTypeID                func(childComplexity int) int
+		Purpose                          func(childComplexity int) int
 		ResidenceCountry                 func(childComplexity int) int
 		ResidenceCountryID               func(childComplexity int) int
 		ResidenceState                   func(childComplexity int) int
@@ -316,6 +317,8 @@ type QueryResolver interface {
 	VerifyEmail(ctx context.Context, code string) (*models.VerifyEmails, error)
 }
 type ResponseUserProfilesResolver interface {
+	Purpose(ctx context.Context, obj *models.ResponseUserProfiles) (*string, error)
+
 	IndealFirstEncointerID(ctx context.Context, obj *models.ResponseUserProfiles) (int, error)
 	IndealFirstEncointer(ctx context.Context, obj *models.ResponseUserProfiles) (string, error)
 
@@ -1094,6 +1097,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ResponseUserProfiles.PresonalityTypeID(childComplexity), true
+
+	case "ResponseUserProfiles.purpose":
+		if e.complexity.ResponseUserProfiles.Purpose == nil {
+			break
+		}
+
+		return e.complexity.ResponseUserProfiles.Purpose(childComplexity), true
 
 	case "ResponseUserProfiles.residence_country":
 		if e.complexity.ResponseUserProfiles.ResidenceCountry == nil {
@@ -5001,6 +5011,47 @@ func (ec *executionContext) fieldContext_ResponseUserProfiles_user_id(ctx contex
 	return fc, nil
 }
 
+func (ec *executionContext) _ResponseUserProfiles_purpose(ctx context.Context, field graphql.CollectedField, obj *models.ResponseUserProfiles) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ResponseUserProfiles_purpose(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ResponseUserProfiles().Purpose(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ResponseUserProfiles_purpose(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ResponseUserProfiles",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ResponseUserProfiles_introduction(ctx context.Context, field graphql.CollectedField, obj *models.ResponseUserProfiles) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ResponseUserProfiles_introduction(ctx, field)
 	if err != nil {
@@ -5022,14 +5073,11 @@ func (ec *executionContext) _ResponseUserProfiles_introduction(ctx context.Conte
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ResponseUserProfiles_introduction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7943,6 +7991,8 @@ func (ec *executionContext) fieldContext_ResponseUsers_user_profile(ctx context.
 			switch field.Name {
 			case "user_id":
 				return ec.fieldContext_ResponseUserProfiles_user_id(ctx, field)
+			case "purpose":
+				return ec.fieldContext_ResponseUserProfiles_purpose(ctx, field)
 			case "introduction":
 				return ec.fieldContext_ResponseUserProfiles_introduction(ctx, field)
 			case "height_id":
@@ -13086,7 +13136,7 @@ func (ec *executionContext) unmarshalInputUpdateUserProfiles(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "body_type_id"}
+	fieldsInOrder := [...]string{"id", "introduction", "body_type_id", "blood_type_id", "occupation_id", "education_id", "annual_income_id", "smoking_id", "drinking_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13101,11 +13151,67 @@ func (ec *executionContext) unmarshalInputUpdateUserProfiles(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "introduction":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("introduction"))
+			it.Introduction, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "body_type_id":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("body_type_id"))
 			it.BodyTypeID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "blood_type_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("blood_type_id"))
+			it.BloodTypeID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "occupation_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("occupation_id"))
+			it.OccupationID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "education_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("education_id"))
+			it.EducationID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "annual_income_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("annual_income_id"))
+			it.AnnualIncomeID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "smoking_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("smoking_id"))
+			it.SmokingID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "drinking_id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("drinking_id"))
+			it.DrinkingID, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13998,13 +14104,27 @@ func (ec *executionContext) _ResponseUserProfiles(ctx context.Context, sel ast.S
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "purpose":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ResponseUserProfiles_purpose(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "introduction":
 
 			out.Values[i] = ec._ResponseUserProfiles_introduction(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "height_id":
 
 			out.Values[i] = ec._ResponseUserProfiles_height_id(ctx, field, obj)

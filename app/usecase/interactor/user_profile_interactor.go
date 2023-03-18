@@ -1,6 +1,7 @@
 package interactor
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
@@ -40,6 +41,9 @@ func (interactor *UserProfileInteractor) Save(up *models.UserProfiles) (*models.
 	if err != nil {
 		return &models.UserProfiles{}, services.NewResultStatus(http.StatusBadRequest, err)
 	}
+
+	fmt.Printf("%+v\n", up)
+	fmt.Println("intro", up.Introduction)
 
 	foundProfile.BodyTypeID = up.BodyTypeID
 

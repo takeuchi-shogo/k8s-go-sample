@@ -69,7 +69,7 @@ func (interactor *AccountInteractor) Signup(account *models.Accounts, user *mode
 
 	account.PhoneNumber = "000000"
 	account.Password, _ = utils.GenerateFromPassword(account.Password)
-	account.LoginStatus = "login"
+	account.LoginStatus = "new_account"
 	account.AccessLevel = 1
 	currentTime := time.Now().Unix()
 	account.CreatedAt = currentTime
@@ -94,7 +94,7 @@ func (interactor *AccountInteractor) Signup(account *models.Accounts, user *mode
 		db.Rollback()
 		return &models.Users{}, "", services.NewResultStatus(http.StatusBadRequest, err)
 	}
-	gender := ""
+	var gender string = ""
 
 	switch createdUser.Gender {
 	case "M":
@@ -102,10 +102,16 @@ func (interactor *AccountInteractor) Signup(account *models.Accounts, user *mode
 	case "F":
 		gender = "M"
 	}
-	if _, err := interactor.UserSearchFilterRepository.Create(db, &models.UserSearchFilters{
-		UserID: createdUser.ID,
-		Gender: &gender,
-	}); err != nil {
+
+	filter := &models.UserSearchFilters{
+		UserID:    createdUser.ID,
+		Gender:    &gender,
+		Location:  nil,
+		CreatedAt: services.SetNowDate(),
+		UpdatedAt: services.SetNowDate(),
+	}
+
+	if _, err = interactor.UserSearchFilterRepository.Create(db, filter); err != nil {
 		db.Rollback()
 		return &models.Users{}, "", services.NewResultStatus(http.StatusBadRequest, err)
 	}

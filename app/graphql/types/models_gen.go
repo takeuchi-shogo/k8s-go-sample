@@ -68,8 +68,15 @@ type UpdateAccounts struct {
 }
 
 type UpdateUserProfiles struct {
-	ID         string `json:"id"`
-	BodyTypeID int    `json:"body_type_id"`
+	ID             string  `json:"id"`
+	Introduction   *string `json:"introduction"`
+	BodyTypeID     int     `json:"body_type_id"`
+	BloodTypeID    int     `json:"blood_type_id"`
+	OccupationID   int     `json:"occupation_id"`
+	EducationID    int     `json:"education_id"`
+	AnnualIncomeID int     `json:"annual_income_id"`
+	SmokingID      int     `json:"smoking_id"`
+	DrinkingID     int     `json:"drinking_id"`
 }
 
 type UpdateUserSearchFilters struct {
