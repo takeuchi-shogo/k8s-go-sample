@@ -14,6 +14,9 @@ func NewUserProfilesPresenter() presenter.UserProfilePresenter {
 
 func (up *UserPriflesPresenter) ResponseUserProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
 	profile := setBasicProfile(p)
+	profile = setUserInformation(profile)
+	profile = setAttitudeTowardsLoveAndMarriage(profile)
+	profile = setPersonalityAndLifstyleAndHobbies(profile)
 	return profile
 }
 
@@ -32,6 +35,24 @@ func setBasicProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
 		AnnualIncomeID:     p.AnnualIncomeID,
 		SmokingID:          p.SmokingID,
 		DrinkingID:         p.DrinkingID,
+
+		SiblingsID:   p.SiblingsID,
+		LanguageID:   p.LanguageID,
+		InterestsID:  p.InterestsID,
+		LookingForID: p.LookingForID,
+
+		MaritalHistoryID:                 p.MaritalHistoryID,
+		PresenceOfChildrenID:             p.PresenceOfChildrenID,
+		IntentionsTowardsMarriageID:      p.IntentionsTowardsMarriageID,
+		DesireForChildrenID:              p.DesireForChildrenID,
+		HouseholdChoresAndChildRearingID: p.HouseholdChoresAndChildRearingID,
+		MeetingPreferenceID:              p.MeetingPreferenceID,
+		DatingExpensesID:                 p.DatingExpensesID,
+
+		PersonalityTypeID: p.PersonalityTypeID,
+		SociabilityID:     p.SociabilityID,
+		RoommatesID:       p.RoommatesID,
+		DaysOffID:         p.DaysOffID,
 	}
 	profile.Height = setHeight(p.HeightID)
 	profile.BodyType = setBodyType(p.BodyTypeID)
@@ -247,7 +268,58 @@ func setDrinking(id int) string {
 }
 
 func setUserInformation(p *models.ResponseUserProfiles) *models.ResponseUserProfiles {
+	p.Siblings = setSiblings(p.SiblingsID)
+	p.Interests = setInterests(p.InterestsID)
+	p.LookingFor = setLookingFor(p.LookingForID)
 	return p
+}
+
+func setSiblings(id int) string {
+	switch id {
+	case 0:
+		return ""
+	case 1:
+		return "長男/長女"
+	case 2:
+		return "次男/次女"
+	case 3:
+		return "末っ子"
+	case 4:
+		return "一人っ子"
+	}
+	return ""
+}
+
+func setInterests(id int) string {
+	switch id {
+	case 0:
+		return ""
+	case 1:
+		return "メル友/TEL友"
+	case 2:
+		return "趣味友達"
+	case 3:
+		return "恋人"
+	case 4:
+		return "婚約者"
+	}
+	return ""
+}
+
+func setLookingFor(id int) string {
+	switch id {
+	case 0:
+		return ""
+	case 1:
+		return "メル友"
+	case 2:
+		return "恋人"
+	case 3:
+		return "婚活"
+	case 4:
+		return "その他"
+	}
+	return ""
 }
 
 func setEducationAndCareer(p *models.ResponseUserProfiles) *models.ResponseUserProfiles {
@@ -260,7 +332,7 @@ func setAttitudeTowardsLoveAndMarriage(p *models.ResponseUserProfiles) *models.R
 	p.IntentionsTowardsMarriage = setIntentionsTowardsMarriage(p.IntentionsTowardsMarriageID)
 	p.DesireForChildren = setDesireForChildren(p.DesireForChildrenID)
 	p.HouseholdChoresAndChildRearing = setHouseholdChoresAndChildRearing(p.HouseholdChoresAndChildRearingID)
-	p.IdealFirstEncounter = setIdealFirstEncounter(p.IdealFirstEncounterID)
+	p.MeetingPreference = setMeetingPreference(p.MeetingPreferenceID)
 	p.DatingExpenses = setDatingExpenses(p.DatingExpensesID)
 
 	return p
@@ -269,15 +341,30 @@ func setAttitudeTowardsLoveAndMarriage(p *models.ResponseUserProfiles) *models.R
 func setMaritalHistory(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "独身(未婚)"
+	case 2:
+		return "独身(離婚)"
+	case 3:
+		return "バツあり"
+	case 4:
+		return "既婚"
 	}
+
 	return ""
 }
 
 func setPresenceOfChildren(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "なし"
+	case 2:
+		return "同居"
+	case 3:
+		return "別居"
 	}
 	return ""
 }
@@ -285,7 +372,17 @@ func setPresenceOfChildren(id int) string {
 func setIntentionsTowardsMarriage(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "今すぐしたい"
+	case 2:
+		return "2〜3年以内にしたい"
+	case 3:
+		return "いい人がいればしたい"
+	case 4:
+		return "相手と相談して決めたい"
+	case 5:
+		return "わからない"
 	}
 	return ""
 }
@@ -293,7 +390,15 @@ func setIntentionsTowardsMarriage(id int) string {
 func setDesireForChildren(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "欲しい"
+	case 2:
+		return "いらない"
+	case 3:
+		return "相手と相談して決めたい"
+	case 4:
+		return "わからない"
 	}
 	return ""
 }
@@ -301,15 +406,33 @@ func setDesireForChildren(id int) string {
 func setHouseholdChoresAndChildRearing(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "積極的に参加したい"
+	case 2:
+		return "できれば参加したい"
+	case 3:
+		return "相手と相談して決めたい"
+	case 4:
+		return "できれば相手に任せたい"
+	case 5:
+		return "相手に任せたい"
 	}
 	return ""
 }
 
-func setIdealFirstEncounter(id int) string {
+func setMeetingPreference(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "ますは会いたい"
+	case 2:
+		return "気が合えば会いたい"
+	case 3:
+		return "メッセージを重ねてから会いたい"
+	case 4:
+		return "メールなどやり取りだけ"
 	}
 	return ""
 }
@@ -317,7 +440,21 @@ func setIdealFirstEncounter(id int) string {
 func setDatingExpenses(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "自分が払う"
+	case 2:
+		return "自分が多く払う"
+	case 3:
+		return "割り勘"
+	case 4:
+		return "自分のものは自分で払う"
+	case 5:
+		return "相手が多く払う"
+	case 6:
+		return "相手が払う"
+	case 7:
+		return "相談して決める"
 	}
 	return ""
 }
@@ -342,7 +479,17 @@ func setPersonalityType(id int) string {
 func setSociability(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "大人数が好き"
+	case 2:
+		return "少人数が好き"
+	case 3:
+		return "一人が好き"
+	case 4:
+		return "徐々に仲良くなる"
+	case 5:
+		return "すぐ仲良くなる"
 	}
 	return ""
 }
@@ -350,7 +497,17 @@ func setSociability(id int) string {
 func setRoommates(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "一人暮らし"
+	case 2:
+		return "実家暮らし"
+	case 3:
+		return "友達と暮らしている"
+	case 4:
+		return "ペットと一緒"
+	case 5:
+		return "寮、社宅"
 	}
 	return ""
 }
@@ -358,7 +515,13 @@ func setRoommates(id int) string {
 func setDaysOff(id int) string {
 	switch id {
 	case 0:
+		return ""
 	case 1:
+		return "土日"
+	case 2:
+		return "平日"
+	case 3:
+		return "不定休"
 	}
 	return ""
 }

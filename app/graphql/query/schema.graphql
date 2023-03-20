@@ -217,10 +217,10 @@ input UpdateUserSearchFilters {
 }
 
 input UpdateAccounts {
-  id: Int!
-  phone_number: String!
-  email: String!
-  password: String!
+  id: Int
+  phone_number: String
+  email: String
+  new_passwored: String
 }
 
 input UpdateUsers {
@@ -234,41 +234,43 @@ input UpdateUsers {
 
 input UpdateUserProfiles {
   id: ID!
-  # user_id: Int!
+  user_id: Int
 	introduction: String
 
-	# height_id: Int!
-	body_type_id: Int!
-	blood_type_id: Int!
-	# residence_id: Int!
-	# hometown_id: Int!
-	occupation_id: Int!
-	education_id: Int!
-	annual_income_id: Int!
-	smoking_id: Int!
-	drinking_id: Int!
+	# height_id: Int
+	body_type_id: Int
+	blood_type_id: Int
+	residence_country_id: Int
+  residence_state_id: Int
+	hometown_country_id: Int
+  hometown_state_id: Int
+	occupation_id: Int
+	education_id: Int
+	annual_income_id: Int
+	smoking_id: Int
+	drinking_id: Int
 
-	# siblings_id: Int!
-	# language_id: Int!
-	# interests_id: Int!
-	# looking_for_id: Int!
+	siblings_id: Int
+	language_id: Int
+	interests_id: Int
+	looking_for_id: Int
 
-	# school_name: String!
-	# job_title: String!
+	school_name: String
+	job_title: String
 
-	# marital_history_id: Int!
-	# presence_of_children_id: Int!
-	# intentions_towards_marriage_id: Int!
-	# desire_for_children_id: Int!
-	# household_chores_and_child_rearing_id: Int!
-	# indeal_first_encointer_id: Int!
-	# dating_expenses_id: Int!
+	marital_history_id: Int
+	presence_of_children_id: Int
+	intentions_towards_marriage_id: Int
+	desire_for_children_id: Int
+	household_chores_and_child_rearing_id: Int
+	meeting_preference_id: Int
+	dating_expenses_id: Int
 
-	# presonality_type_id: Int!
-	# sociability_id: Int!
-	# roommates_id: Int!
-	# days_off_id: Int!
-	# hobbies_id: Int!
+	personality_type_id: Int
+	sociability_id: Int
+	roommates_id: Int
+	days_off_id: Int
+	hobbies_id: Int
 }
 
 input NewVerifyEmails {

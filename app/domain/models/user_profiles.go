@@ -34,7 +34,7 @@ type UserProfiles struct {
 	IntentionsTowardsMarriageID      int `json:"intentions_towards_marriage_id"`
 	DesireForChildrenID              int `json:"desire_for_children_id"`
 	HouseholdChoresAndChildRearingID int `json:"household_chores_and_child_rearing_id"`
-	IdealFirstEncounterID            int `json:"indeal_first_encointer_id"`
+	MeetingPreferenceID              int `json:"meeting_preference_id"`
 	DatingExpensesID                 int `json:"dating_expenses_id"`
 	// Personality, Lifestyle, Hobbies
 	PersonalityTypeID int `json:"presonality_type_id"`
@@ -104,8 +104,8 @@ type ResponseUserProfiles struct {
 	DesireForChildren                string `json:"desire_for_children"`
 	HouseholdChoresAndChildRearingID int    `json:"household_chores_and_child_rearing_id"`
 	HouseholdChoresAndChildRearing   string `json:"household_chores_and_child_rearing"`
-	IdealFirstEncounterID            int    `json:"ideal_first_encounter_id"`
-	IdealFirstEncounter              string `json:"indeal_first_encounter"`
+	MeetingPreferenceID              int    `json:"meeting_preference_id"`
+	MeetingPreference                string `json:"meeting_preference"`
 	DatingExpensesID                 int    `json:"dating_expenses_id"`
 	DatingExpenses                   string `json:"dating_expenses"`
 	// Personality, Lifestyle, Hobbies

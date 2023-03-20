@@ -118,16 +118,16 @@ func (r *mutationResolver) UpdateUserSearchFilters(ctx context.Context, input *t
 
 // UpdateAccount is the resolver for the updateAccount field.
 func (r *mutationResolver) UpdateAccount(ctx context.Context, input *types.UpdateAccounts) (*models.Accounts, error) {
-	account := &models.Accounts{
-		ID:          input.ID,
-		PhoneNumber: input.PhoneNumber,
-		Email:       input.Email,
-		Password:    input.Password,
-	}
+	// account := &models.Accounts{
+	// 	ID:          input.ID,
+	// 	PhoneNumber: input.PhoneNumber,
+	// 	Email:       input.Email,
+	// 	Password:    input.Password,
+	// }
 
 	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB, r.Jwt)
 
-	return accountsGraphqlController.Patch(ctx, account)
+	return accountsGraphqlController.Patch(ctx, input)
 }
 
 // UpdateUser is the resolver for the updateUser field.
@@ -148,15 +148,8 @@ func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUs
 
 // UpdateUserProfile is the resolver for the updateUserProfile field.
 func (r *mutationResolver) UpdateUserProfile(ctx context.Context, input *types.UpdateUserProfiles) (*models.UserProfiles, error) {
-	id, _ := strconv.Atoi(input.ID)
-	profile := &models.UserProfiles{
-		ID: id,
-		// UserID:     input.UserID,
-		Introduction: input.Introduction,
-		BodyTypeID:   input.BodyTypeID,
-	}
 	userProfilesGraphqlController := controllers.NewUserProfilesGraphqlController(r.DB)
-	return userProfilesGraphqlController.Patch(ctx, profile)
+	return userProfilesGraphqlController.Patch(ctx, input)
 }
 
 // CreateVerifyEmail is the resolver for the createVerifyEmail field.

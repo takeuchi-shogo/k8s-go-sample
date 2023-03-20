@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/helpers"
@@ -82,9 +83,24 @@ func (controller *AccountsGraphqlController) Post(
 
 func (controller *AccountsGraphqlController) Patch(
 	ctx context.Context,
-	account *models.Accounts,
+	account *types.UpdateAccounts,
 ) (*models.Accounts, error) {
-	updatedAccount, res := controller.Interactor.Save(account)
+	gc, err := helpers.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	token := gc.GetHeader("authorization")
+	if token == "" {
+		return nil, helpers.GraphQLErrorResponse(ctx, errors.New("ログインしてください"), 401)
+	}
+
+	userID, res := controller.Authorize.Verify(token)
+	if res.Error != nil {
+		return nil, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+	}
+
+	updatedAccount, res := controller.Interactor.Save(userID, account)
 	if res.Error != nil {
 		return updatedAccount, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}

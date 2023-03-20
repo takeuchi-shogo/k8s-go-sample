@@ -21,6 +21,8 @@
   - 年齢 - Age
   - 兄弟 - Siblings
   - 言語 - Language
+  - 興味あるもの - Interests
+  - 目的 - LookingFor
 
 - 学歴・職歴 - Education and Career
 

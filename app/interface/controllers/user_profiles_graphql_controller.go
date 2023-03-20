@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/helpers"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/interactor"
@@ -32,7 +33,7 @@ func (controller *UserProfilesGraphqlController) Get(ctx context.Context, userID
 	return userProfile, nil
 }
 
-func (controller *UserProfilesGraphqlController) Patch(ctx context.Context, userProfile *models.UserProfiles) (*models.UserProfiles, error) {
+func (controller *UserProfilesGraphqlController) Patch(ctx context.Context, userProfile *types.UpdateUserProfiles) (*models.UserProfiles, error) {
 
 	updatedUserProfile, res := controller.Interactor.Save(userProfile)
 	if res.Error != nil {

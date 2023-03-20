@@ -16,26 +16,6 @@ func (r *responseUserProfilesResolver) Purpose(ctx context.Context, obj *models.
 	panic(fmt.Errorf("not implemented: Purpose - purpose"))
 }
 
-// IndealFirstEncointerID is the resolver for the indeal_first_encointer_id field.
-func (r *responseUserProfilesResolver) IndealFirstEncointerID(ctx context.Context, obj *models.ResponseUserProfiles) (int, error) {
-	panic(fmt.Errorf("not implemented: IndealFirstEncointerID - indeal_first_encointer_id"))
-}
-
-// IndealFirstEncointer is the resolver for the indeal_first_encointer field.
-func (r *responseUserProfilesResolver) IndealFirstEncointer(ctx context.Context, obj *models.ResponseUserProfiles) (string, error) {
-	panic(fmt.Errorf("not implemented: IndealFirstEncointer - indeal_first_encointer"))
-}
-
-// PresonalityTypeID is the resolver for the presonality_type_id field.
-func (r *responseUserProfilesResolver) PresonalityTypeID(ctx context.Context, obj *models.ResponseUserProfiles) (int, error) {
-	panic(fmt.Errorf("not implemented: PresonalityTypeID - presonality_type_id"))
-}
-
-// PresonalityType is the resolver for the presonality_type field.
-func (r *responseUserProfilesResolver) PresonalityType(ctx context.Context, obj *models.ResponseUserProfiles) (string, error) {
-	panic(fmt.Errorf("not implemented: PresonalityType - presonality_type"))
-}
-
 // ResponseUserProfiles returns ResponseUserProfilesResolver implementation.
 func (r *Resolver) ResponseUserProfiles() ResponseUserProfilesResolver {
 	return &responseUserProfilesResolver{r}
@@ -49,6 +29,18 @@ type responseUserProfilesResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *responseUserProfilesResolver) PresonalityTypeID(ctx context.Context, obj *models.ResponseUserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: PresonalityTypeID - presonality_type_id"))
+}
+func (r *responseUserProfilesResolver) PresonalityType(ctx context.Context, obj *models.ResponseUserProfiles) (string, error) {
+	panic(fmt.Errorf("not implemented: PresonalityType - presonality_type"))
+}
+func (r *responseUserProfilesResolver) IndealFirstEncointerID(ctx context.Context, obj *models.ResponseUserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: IndealFirstEncointerID - indeal_first_encointer_id"))
+}
+func (r *responseUserProfilesResolver) IndealFirstEncointer(ctx context.Context, obj *models.ResponseUserProfiles) (string, error) {
+	panic(fmt.Errorf("not implemented: IndealFirstEncointer - indeal_first_encointer"))
+}
 func (r *responseUserProfilesResolver) EducationalID(ctx context.Context, obj *models.ResponseUserProfiles) (int, error) {
 	panic(fmt.Errorf("not implemented: EducationalID - educational_id"))
 }

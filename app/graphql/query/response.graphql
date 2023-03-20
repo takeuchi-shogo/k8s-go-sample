@@ -50,13 +50,13 @@ type ResponseUserProfiles {
 	desire_for_children: String!
 	household_chores_and_child_rearing_id: Int!
 	household_chores_and_child_rearing: String!
-	indeal_first_encointer_id: Int!
-	indeal_first_encointer: String!
+	meeting_preference_id: Int!
+	meeting_preference: String!
 	dating_expenses_id: Int!
 	dating_expenses: String!
 
-	presonality_type_id: Int!
-	presonality_type: String!
+	personality_type_id: Int!
+	personality_type: String!
 	sociability_id: Int!
 	sociability: String!
 	roommates_id: Int!

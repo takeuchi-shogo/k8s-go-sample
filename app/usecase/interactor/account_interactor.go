@@ -1,10 +1,12 @@
 package interactor
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
+	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/gateway"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/repository"
 	"github.com/takeuchi-shogo/k8s-go-sample/usecase/services"
@@ -131,12 +133,53 @@ func (interactor *AccountInteractor) Signup(account *models.Accounts, user *mode
 	return createdUser, jwtToken, services.NewResultStatus(http.StatusOK, nil)
 }
 
-func (interactor *AccountInteractor) Save(a *models.Accounts) (*models.Accounts, *services.ResultStatus) {
+func (interactor *AccountInteractor) Save(userID int, a *types.UpdateAccounts) (*models.Accounts, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
 
-	account, err := interactor.AccountRepository.Save(db, a)
+	foundUser, err := interactor.UserRepository.FindByID(db, userID)
+	if err != nil {
+		return &models.Accounts{}, services.NewResultStatus(http.StatusBadRequest, err)
+	}
+
+	foundAccount, err := interactor.AccountRepository.FindByID(db, foundUser.AccountID)
+	if err != nil {
+		return &models.Accounts{}, services.NewResultStatus(http.StatusBadRequest, err)
+	}
+
+	if a.ID != nil {
+		id := *a.ID
+		foundAccount.ID = id
+	}
+	if a.PhoneNumber != nil {
+		phone := *a.PhoneNumber
+		foundAccount.PhoneNumber = phone
+	}
+	if a.Email != nil {
+		email := *a.Email
+		foundAccount.Email = email
+	}
+	foundAccount.Password, err = generatePassword(foundAccount.Password, a.NewPasswored)
+
+	account, err := interactor.AccountRepository.Save(db, foundAccount)
 	if err != nil {
 		return &models.Accounts{}, services.NewResultStatus(http.StatusBadRequest, err)
 	}
 	return account, services.NewResultStatus(http.StatusOK, nil)
+}
+
+func generatePassword(currentPassword string, newPassword *string) (string, error) {
+	// NULL or undefind、nilの確認
+	if newPassword != nil {
+		if *newPassword != "" {
+			pass := *newPassword
+			if err := utils.CheckPassword(pass, currentPassword); err != nil {
+				return "", err
+			}
+			return utils.GenerateFromPassword(*newPassword)
+		} else {
+			return "", errors.New("新しいパスワードを入力してください")
+		}
+	}
+
+	return currentPassword, nil
 }

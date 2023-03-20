@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -96,7 +95,6 @@ func (r *Routes) graphqlHandler() gin.HandlerFunc {
 	// h.AddTransport(transport.POST{})
 
 	return func(c *gin.Context) {
-		fmt.Println(c.Request.Header.Get("Authorization"))
 		// Create JWT
 		// jwtToken := "testJwtToken"
 
