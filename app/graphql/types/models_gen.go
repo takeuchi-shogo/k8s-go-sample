@@ -61,16 +61,18 @@ type PageInfo struct {
 }
 
 type UpdateAccounts struct {
-	ID           *int    `json:"id"`
-	PhoneNumber  *string `json:"phone_number"`
-	Email        *string `json:"email"`
-	NewPasswored *string `json:"new_passwored"`
+	ID              *int    `json:"id"`
+	PhoneNumber     *string `json:"phone_number"`
+	Email           *string `json:"email"`
+	CurrentPassword *string `json:"current_password"`
+	NewPassword     *string `json:"new_password"`
 }
 
 type UpdateUserProfiles struct {
 	ID                               string  `json:"id"`
 	UserID                           *int    `json:"user_id"`
 	Introduction                     *string `json:"introduction"`
+	Height                           *int    `json:"height"`
 	BodyTypeID                       *int    `json:"body_type_id"`
 	BloodTypeID                      *int    `json:"blood_type_id"`
 	ResidenceCountryID               *int    `json:"residence_country_id"`
@@ -119,10 +121,12 @@ type UpdateUserSearchFilters struct {
 }
 
 type UpdateUsers struct {
-	DisplayName string `json:"display_name"`
-	Gender      string `json:"gender"`
-	Age         int    `json:"age"`
-	Location    string `json:"location"`
+	ID          *int    `json:"id"`
+	DisplayName *string `json:"display_name"`
+	ScreenName  *string `json:"screen_name"`
+	Gender      string  `json:"gender"`
+	Age         *int    `json:"age"`
+	Location    *string `json:"location"`
 }
 
 type UserConnection struct {

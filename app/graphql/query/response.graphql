@@ -3,8 +3,8 @@ type ResponseUserProfiles {
 	purpose: String
 	introduction: String
 
-	height_id: Int!
-	height: String!
+	height: Int!
+	# height: String!
 	body_type_id: Int!
 	body_type: String!
 	blood_type_id: Int!

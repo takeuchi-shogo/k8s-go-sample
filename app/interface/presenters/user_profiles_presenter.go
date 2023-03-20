@@ -23,7 +23,7 @@ func (up *UserPriflesPresenter) ResponseUserProfile(p *models.UserProfiles) *mod
 func setBasicProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
 	profile := &models.ResponseUserProfiles{
 		Introduction:       p.Introduction,
-		HeightID:           p.HeightID,
+		Height:             p.Height,
 		BodyTypeID:         p.BodyTypeID,
 		BloodTypeID:        p.BloodTypeID,
 		ResidenceCountryID: p.ResidenceCountryID,
@@ -54,7 +54,7 @@ func setBasicProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
 		RoommatesID:       p.RoommatesID,
 		DaysOffID:         p.DaysOffID,
 	}
-	profile.Height = setHeight(p.HeightID)
+	// profile.Height = setHeight(p.HeightID)
 	profile.BodyType = setBodyType(p.BodyTypeID)
 	profile.BloodType = setBloodType(p.BloodTypeID)
 	profile.ResidenceCountry, profile.ResidenceState = setResidence(p.ResidenceCountryID, p.ResidenceStateID)

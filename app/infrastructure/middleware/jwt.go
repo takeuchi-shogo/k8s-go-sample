@@ -44,6 +44,7 @@ func (j *Jwt) CreateToken(userID int) string {
 
 	// Add Signature to Token
 	tokenString, _ := token.SignedString([]byte(j.SecretKey))
+	fmt.Println(tokenString)
 	return tokenString
 }
 

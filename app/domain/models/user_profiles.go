@@ -6,7 +6,7 @@ type UserProfiles struct {
 	Purpose      int     `json:"purpose"`
 	Introduction *string `json:"introduction"`
 	// Basic Profile
-	HeightID           int `json:"height_id"`
+	Height             int `json:"height"`
 	BodyTypeID         int `json:"body_type_id"`
 	BloodTypeID        int `json:"blood_type_id"`
 	ResidenceCountryID int `json:"residence_country_id"`
@@ -55,8 +55,7 @@ type ResponseUserProfiles struct {
 	// Interests    *string `json:"interests"`
 	// LookingFor   *string `json:"looking_for"`
 	// Basic Profile
-	HeightID           int    `json:"height_id"`
-	Height             string `json:"height"`
+	Height             int    `json:"height"`
 	BodyTypeID         int    `json:"body_type_id"`
 	BodyType           string `json:"body_type"`
 	BloodTypeID        int    `json:"blood_type_id"`

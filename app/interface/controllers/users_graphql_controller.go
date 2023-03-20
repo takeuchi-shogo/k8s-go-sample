@@ -97,7 +97,7 @@ func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*mod
 	return user, nil
 }
 
-func (controller *UsersGraphqlController) Patch(ctx context.Context, user *models.Users) (*models.Users, error) {
+func (controller *UsersGraphqlController) Patch(ctx context.Context, user *types.UpdateUsers) (*models.Users, error) {
 	gc, err := helpers.GinContextFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -112,11 +112,11 @@ func (controller *UsersGraphqlController) Patch(ctx context.Context, user *model
 	if res.Error != nil {
 		return nil, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
-	user.ID = userID
+	user.ID = &userID
 
 	updatedUser, res := controller.Interactor.Save(user)
 	if res.Error != nil {
-		return user, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+		return nil, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
 	return updatedUser, nil
 }

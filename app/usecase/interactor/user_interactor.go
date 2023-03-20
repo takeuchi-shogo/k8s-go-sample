@@ -134,22 +134,38 @@ func (interactor *UserInteractor) Create(u *models.Users, accountID int, code st
 	return user, services.NewResultStatus(http.StatusOK, nil)
 }
 
-func setValue(user, foundUser *models.Users) *models.Users {
-	foundUser.DisplayName = user.DisplayName
-	// foundUser.ScreenName = user.ScreenName
+func setValue(user *types.UpdateUsers, foundUser *models.Users) *models.Users {
+	if user.DisplayName != nil {
+		if *user.DisplayName != "" {
+			foundUser.DisplayName = *user.DisplayName
+		}
+	}
+	if user.ScreenName != nil {
+		if *user.ScreenName != "" {
+			foundUser.ScreenName = *user.ScreenName
+		}
+	}
+	if user.Age != nil {
+		if *user.Age != 0 {
+			foundUser.Age = *user.Age
+		}
+	}
+	if user.Location != nil {
+		if *user.Location != "" {
+			foundUser.Location = *user.Location
+		}
+	}
 	foundUser.Gender = user.Gender
-	foundUser.Age = user.Age
-	foundUser.Location = user.Location
 	foundUser.UpdatedAt = time.Now().Unix()
 
 	return foundUser
 }
 
-func (interactor *UserInteractor) Save(u *models.Users) (*models.Users, *services.ResultStatus) {
+func (interactor *UserInteractor) Save(u *types.UpdateUsers) (*models.Users, *services.ResultStatus) {
 
 	db := interactor.DBRepository.Connect()
 
-	foundUser, err := interactor.UserRepository.FindByID(db, u.ID)
+	foundUser, err := interactor.UserRepository.FindByID(db, *u.ID)
 	if err != nil {
 		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
 	}

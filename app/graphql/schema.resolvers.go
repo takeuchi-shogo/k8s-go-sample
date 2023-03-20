@@ -34,6 +34,11 @@ func (r *blocksResolver) Blocked(ctx context.Context, obj *models.Blocks) (int, 
 	panic(fmt.Errorf("not implemented: Blocked - blocked"))
 }
 
+// BlockedUser is the resolver for the blocked_user field.
+func (r *blocksResolver) BlockedUser(ctx context.Context, obj *models.Blocks) (*models.Users, error) {
+	panic(fmt.Errorf("not implemented: BlockedUser - blocked_user"))
+}
+
 // CreateAccount is the resolver for the createAccount field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input *types.NewAccounts) (*models.Accounts, error) {
 	a := &models.Accounts{
@@ -80,9 +85,9 @@ func (r *mutationResolver) CreateReport(ctx context.Context, input *types.NewRep
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input *types.NewLogin) (*models.Users, error) {
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*models.Users, error) {
 	authorizeGraphqlController := controllers.NewAuthorizeGraphqlController(r.DB, r.Jwt)
-	return &models.Users{}, authorizeGraphqlController.Login(ctx, input.Email, input.Password)
+	return authorizeGraphqlController.Login(ctx, email, password)
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -132,18 +137,18 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, input *types.Updat
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error) {
-	user := &models.Users{
-		// ID:          input.ID,
-		DisplayName: input.DisplayName,
-		// ScreenName:  input.ScreenName,
-		Gender:   input.Gender,
-		Age:      input.Age,
-		Location: input.Location,
-	}
+	// user := &models.Users{
+	// 	// ID:          input.ID,
+	// 	DisplayName: input.DisplayName,
+	// 	// ScreenName:  input.ScreenName,
+	// 	Gender:   input.Gender,
+	// 	Age:      input.Age,
+	// 	Location: input.Location,
+	// }
 
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
-	return usersGraphqlController.Patch(ctx, user)
+	return usersGraphqlController.Patch(ctx, input)
 }
 
 // UpdateUserProfile is the resolver for the updateUserProfile field.
@@ -221,6 +226,11 @@ func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*models.V
 	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
 
 	return verifyEmailsGraphqlController.Get(ctx, code)
+}
+
+// HeightID is the resolver for the height_id field.
+func (r *userProfilesResolver) HeightID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: HeightID - height_id"))
 }
 
 // ResidenceID is the resolver for the residence_id field.

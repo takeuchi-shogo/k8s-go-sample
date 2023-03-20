@@ -1,0 +1,85 @@
+# アカウントデータ取得時
+query {
+	account {
+		phone_number
+		email
+		password
+		access_level
+	}
+}
+
+# ユーザーリストに必要なデータ
+query {
+	users {
+		screen_name
+		display_name
+		age
+		location
+		# tweet {
+		# 	text
+		# }
+	}
+}
+
+# ユーザー詳細ページに必要なデータ
+# screen_nameで判断する
+query {
+	user(screenName: $screen_name) {
+		screen_name
+		display_name
+		age
+		like {
+			id
+		}
+		# tweet {
+		# 	text
+		# }
+		user_profile {
+			introduction
+			height
+			body_type
+			blood_type
+			...
+		}
+	}
+}
+
+# 呟きのリストを取得する
+# ここからがN＋1問題に直面しそう
+query {
+	tweets {
+		id
+		text
+		created_at
+		user {
+			screen_name
+			display_name
+			age
+		}
+		like_cnt
+		comment_cnt
+	}
+}
+
+query {
+	tweet(id: $id) {
+		id
+		text
+		created_at
+		user {
+			screen_name
+			display_name
+			age
+		}
+		like_cnt
+		comments {
+			id
+			text
+			created_at
+			user {
+				screen_name
+				display_name
+			}
+		}
+	}
+}

@@ -3,6 +3,7 @@ package interactor
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
@@ -43,6 +44,11 @@ func (interactor *UserProfileInteractor) Save(up *types.UpdateUserProfiles) (*mo
 	foundProfile, err := interactor.UserProfileRepository.FindByID(db, id)
 	if err != nil {
 		return &models.UserProfiles{}, services.NewResultStatus(http.StatusBadRequest, err)
+	}
+	if up.Introduction != nil {
+		if *up.Introduction != "" {
+			foundProfile.Introduction = up.Introduction
+		}
 	}
 
 	if checkValue(up.BodyTypeID) {
@@ -152,6 +158,8 @@ func (interactor *UserProfileInteractor) Save(up *types.UpdateUserProfiles) (*mo
 		id := *up.DaysOffID
 		foundProfile.DaysOffID = id
 	}
+
+	foundProfile.UpdatedAt = time.Now().Unix()
 
 	profile, err := interactor.UserProfileRepository.Save(db, foundProfile)
 	if err != nil {

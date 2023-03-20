@@ -61,9 +61,10 @@ type ComplexityRoot struct {
 	}
 
 	Blocks struct {
-		Blocked  func(childComplexity int) int
-		Blocking func(childComplexity int) int
-		ID       func(childComplexity int) int
+		Blocked     func(childComplexity int) int
+		BlockedUser func(childComplexity int) int
+		Blocking    func(childComplexity int) int
+		ID          func(childComplexity int) int
 	}
 
 	Likes struct {
@@ -88,7 +89,7 @@ type ComplexityRoot struct {
 		CreateUser              func(childComplexity int, input *types.NewUsers) int
 		CreateUserSearchFilters func(childComplexity int, input *types.NewUserSearchFilters) int
 		CreateVerifyEmail       func(childComplexity int, input *types.NewVerifyEmails) int
-		Login                   func(childComplexity int, input *types.NewLogin) int
+		Login                   func(childComplexity int, email string, password string) int
 		UpdateAccount           func(childComplexity int, input *types.UpdateAccounts) int
 		UpdateUser              func(childComplexity int, input *types.UpdateUsers) int
 		UpdateUserProfile       func(childComplexity int, input *types.UpdateUserProfiles) int
@@ -140,7 +141,6 @@ type ComplexityRoot struct {
 		Education                        func(childComplexity int) int
 		EducationID                      func(childComplexity int) int
 		Height                           func(childComplexity int) int
-		HeightID                         func(childComplexity int) int
 		Hobbies                          func(childComplexity int) int
 		HobbiesID                        func(childComplexity int) int
 		HometownCountry                  func(childComplexity int) int
@@ -288,6 +288,7 @@ type AccountsResolver interface {
 type BlocksResolver interface {
 	Blocking(ctx context.Context, obj *models.Blocks) (int, error)
 	Blocked(ctx context.Context, obj *models.Blocks) (int, error)
+	BlockedUser(ctx context.Context, obj *models.Blocks) (*models.Users, error)
 }
 type MutationResolver interface {
 	CreateAccount(ctx context.Context, input *types.NewAccounts) (*models.Accounts, error)
@@ -295,7 +296,7 @@ type MutationResolver interface {
 	CreateBlock(ctx context.Context, input *types.NewBlocks) (*models.Blocks, error)
 	CreateLike(ctx context.Context, input *types.NewLikes) (*models.Likes, error)
 	CreateReport(ctx context.Context, input *types.NewReports) (*models.Reports, error)
-	Login(ctx context.Context, input *types.NewLogin) (*models.Users, error)
+	Login(ctx context.Context, email string, password string) (*models.Users, error)
 	CreateUser(ctx context.Context, input *types.NewUsers) (*models.Users, error)
 	CreateUserSearchFilters(ctx context.Context, input *types.NewUserSearchFilters) (*models.UserSearchFilters, error)
 	UpdateUserSearchFilters(ctx context.Context, input *types.UpdateUserSearchFilters) (*models.UserSearchFilters, error)
@@ -320,6 +321,8 @@ type ResponseUserProfilesResolver interface {
 	Purpose(ctx context.Context, obj *models.ResponseUserProfiles) (*string, error)
 }
 type UserProfilesResolver interface {
+	HeightID(ctx context.Context, obj *models.UserProfiles) (int, error)
+
 	ResidenceID(ctx context.Context, obj *models.UserProfiles) (int, error)
 	HometownID(ctx context.Context, obj *models.UserProfiles) (int, error)
 
@@ -394,6 +397,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Blocks.Blocked(childComplexity), true
+
+	case "Blocks.blocked_user":
+		if e.complexity.Blocks.BlockedUser == nil {
+			break
+		}
+
+		return e.complexity.Blocks.BlockedUser(childComplexity), true
 
 	case "Blocks.blocking":
 		if e.complexity.Blocks.Blocking == nil {
@@ -564,7 +574,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.Login(childComplexity, args["input"].(*types.NewLogin)), true
+		return e.complexity.Mutation.Login(childComplexity, args["email"].(string), args["password"].(string)), true
 
 	case "Mutation.updateAccount":
 		if e.complexity.Mutation.UpdateAccount == nil {
@@ -888,13 +898,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ResponseUserProfiles.Height(childComplexity), true
-
-	case "ResponseUserProfiles.height_id":
-		if e.complexity.ResponseUserProfiles.HeightID == nil {
-			break
-		}
-
-		return e.complexity.ResponseUserProfiles.HeightID(childComplexity), true
 
 	case "ResponseUserProfiles.hobbies":
 		if e.complexity.ResponseUserProfiles.Hobbies == nil {
@@ -1940,15 +1943,24 @@ func (ec *executionContext) field_Mutation_createVerifyEmail_args(ctx context.Co
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *types.NewLogin
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalONewLogin2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewLogin(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["input"] = arg0
+	args["email"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["password"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["password"] = arg1
 	return args, nil
 }
 
@@ -2560,6 +2572,71 @@ func (ec *executionContext) fieldContext_Blocks_blocked(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Blocks_blocked_user(ctx context.Context, field graphql.CollectedField, obj *models.Blocks) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Blocks_blocked_user(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Blocks().BlockedUser(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*models.Users)
+	fc.Result = res
+	return ec.marshalOUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUsers(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Blocks_blocked_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Blocks",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Users_id(ctx, field)
+			case "uuid":
+				return ec.fieldContext_Users_uuid(ctx, field)
+			case "account_id":
+				return ec.fieldContext_Users_account_id(ctx, field)
+			case "display_name":
+				return ec.fieldContext_Users_display_name(ctx, field)
+			case "screen_name":
+				return ec.fieldContext_Users_screen_name(ctx, field)
+			case "gender":
+				return ec.fieldContext_Users_gender(ctx, field)
+			case "age":
+				return ec.fieldContext_Users_age(ctx, field)
+			case "location":
+				return ec.fieldContext_Users_location(ctx, field)
+			case "is_authorize_email":
+				return ec.fieldContext_Users_is_authorize_email(ctx, field)
+			case "is_verified_email":
+				return ec.fieldContext_Users_is_verified_email(ctx, field)
+			case "is_verified_age":
+				return ec.fieldContext_Users_is_verified_age(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Users", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Likes_id(ctx context.Context, field graphql.CollectedField, obj *models.Likes) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Likes_id(ctx, field)
 	if err != nil {
@@ -3058,6 +3135,8 @@ func (ec *executionContext) fieldContext_Mutation_createBlock(ctx context.Contex
 				return ec.fieldContext_Blocks_blocking(ctx, field)
 			case "blocked":
 				return ec.fieldContext_Blocks_blocked(ctx, field)
+			case "blocked_user":
+				return ec.fieldContext_Blocks_blocked_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Blocks", field.Name)
 		},
@@ -3218,7 +3297,7 @@ func (ec *executionContext) _Mutation_login(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Login(rctx, fc.Args["input"].(*types.NewLogin))
+		return ec.resolvers.Mutation().Login(rctx, fc.Args["email"].(string), fc.Args["password"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4138,6 +4217,8 @@ func (ec *executionContext) fieldContext_Query_blocks(ctx context.Context, field
 				return ec.fieldContext_Blocks_blocking(ctx, field)
 			case "blocked":
 				return ec.fieldContext_Blocks_blocked(ctx, field)
+			case "blocked_user":
+				return ec.fieldContext_Blocks_blocked_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Blocks", field.Name)
 		},
@@ -4189,6 +4270,8 @@ func (ec *executionContext) fieldContext_Query_block(ctx context.Context, field 
 				return ec.fieldContext_Blocks_blocking(ctx, field)
 			case "blocked":
 				return ec.fieldContext_Blocks_blocked(ctx, field)
+			case "blocked_user":
+				return ec.fieldContext_Blocks_blocked_user(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Blocks", field.Name)
 		},
@@ -5087,50 +5170,6 @@ func (ec *executionContext) fieldContext_ResponseUserProfiles_introduction(ctx c
 	return fc, nil
 }
 
-func (ec *executionContext) _ResponseUserProfiles_height_id(ctx context.Context, field graphql.CollectedField, obj *models.ResponseUserProfiles) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ResponseUserProfiles_height_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.HeightID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ResponseUserProfiles_height_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ResponseUserProfiles",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ResponseUserProfiles_height(ctx context.Context, field graphql.CollectedField, obj *models.ResponseUserProfiles) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ResponseUserProfiles_height(ctx, field)
 	if err != nil {
@@ -5157,9 +5196,9 @@ func (ec *executionContext) _ResponseUserProfiles_height(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ResponseUserProfiles_height(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5169,7 +5208,7 @@ func (ec *executionContext) fieldContext_ResponseUserProfiles_height(ctx context
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7989,8 +8028,6 @@ func (ec *executionContext) fieldContext_ResponseUsers_user_profile(ctx context.
 				return ec.fieldContext_ResponseUserProfiles_purpose(ctx, field)
 			case "introduction":
 				return ec.fieldContext_ResponseUserProfiles_introduction(ctx, field)
-			case "height_id":
-				return ec.fieldContext_ResponseUserProfiles_height_id(ctx, field)
 			case "height":
 				return ec.fieldContext_ResponseUserProfiles_height(ctx, field)
 			case "body_type_id":
@@ -8511,7 +8548,7 @@ func (ec *executionContext) _UserProfiles_height_id(ctx context.Context, field g
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.HeightID, nil
+		return ec.resolvers.UserProfiles().HeightID(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8532,8 +8569,8 @@ func (ec *executionContext) fieldContext_UserProfiles_height_id(ctx context.Cont
 	fc = &graphql.FieldContext{
 		Object:     "UserProfiles",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
 		},
@@ -13078,7 +13115,7 @@ func (ec *executionContext) unmarshalInputUpdateAccounts(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "phone_number", "email", "new_passwored"}
+	fieldsInOrder := [...]string{"id", "phone_number", "email", "current_password", "new_password"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13109,11 +13146,19 @@ func (ec *executionContext) unmarshalInputUpdateAccounts(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "new_passwored":
+		case "current_password":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new_passwored"))
-			it.NewPasswored, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("current_password"))
+			it.CurrentPassword, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "new_password":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("new_password"))
+			it.NewPassword, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13130,7 +13175,7 @@ func (ec *executionContext) unmarshalInputUpdateUserProfiles(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"id", "user_id", "introduction", "body_type_id", "blood_type_id", "residence_country_id", "residence_state_id", "hometown_country_id", "hometown_state_id", "occupation_id", "education_id", "annual_income_id", "smoking_id", "drinking_id", "siblings_id", "language_id", "interests_id", "looking_for_id", "school_name", "job_title", "marital_history_id", "presence_of_children_id", "intentions_towards_marriage_id", "desire_for_children_id", "household_chores_and_child_rearing_id", "meeting_preference_id", "dating_expenses_id", "personality_type_id", "sociability_id", "roommates_id", "days_off_id", "hobbies_id"}
+	fieldsInOrder := [...]string{"id", "user_id", "introduction", "height", "body_type_id", "blood_type_id", "residence_country_id", "residence_state_id", "hometown_country_id", "hometown_state_id", "occupation_id", "education_id", "annual_income_id", "smoking_id", "drinking_id", "siblings_id", "language_id", "interests_id", "looking_for_id", "school_name", "job_title", "marital_history_id", "presence_of_children_id", "intentions_towards_marriage_id", "desire_for_children_id", "household_chores_and_child_rearing_id", "meeting_preference_id", "dating_expenses_id", "personality_type_id", "sociability_id", "roommates_id", "days_off_id", "hobbies_id"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13158,6 +13203,14 @@ func (ec *executionContext) unmarshalInputUpdateUserProfiles(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("introduction"))
 			it.Introduction, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "height":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("height"))
+			it.Height, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13530,18 +13583,34 @@ func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj i
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"display_name", "gender", "age", "location"}
+	fieldsInOrder := [...]string{"id", "display_name", "screen_name", "gender", "age", "location"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "display_name":
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("display_name"))
-			it.DisplayName, err = ec.unmarshalNString2string(ctx, v)
+			it.DisplayName, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "screen_name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("screen_name"))
+			it.ScreenName, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13557,7 +13626,7 @@ func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("age"))
-			it.Age, err = ec.unmarshalNInt2int(ctx, v)
+			it.Age, err = ec.unmarshalOInt2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13565,7 +13634,7 @@ func (ec *executionContext) unmarshalInputUpdateUsers(ctx context.Context, obj i
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("location"))
-			it.Location, err = ec.unmarshalNString2string(ctx, v)
+			it.Location, err = ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13722,6 +13791,23 @@ func (ec *executionContext) _Blocks(ctx context.Context, sel ast.SelectionSet, o
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "blocked_user":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Blocks_blocked_user(ctx, field, obj)
 				return res
 			}
 
@@ -14303,13 +14389,6 @@ func (ec *executionContext) _ResponseUserProfiles(ctx context.Context, sel ast.S
 
 			out.Values[i] = ec._ResponseUserProfiles_introduction(ctx, field, obj)
 
-		case "height_id":
-
-			out.Values[i] = ec._ResponseUserProfiles_height_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "height":
 
 			out.Values[i] = ec._ResponseUserProfiles_height(ctx, field, obj)
@@ -14900,12 +14979,25 @@ func (ec *executionContext) _UserProfiles(ctx context.Context, sel ast.Selection
 				atomic.AddUint32(&invalids, 1)
 			}
 		case "height_id":
+			field := field
 
-			out.Values[i] = ec._UserProfiles_height_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._UserProfiles_height_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "body_type_id":
 
 			out.Values[i] = ec._UserProfiles_body_type_id(ctx, field, obj)
@@ -16494,14 +16586,6 @@ func (ec *executionContext) unmarshalONewLikes2ᚖgithubᚗcomᚋtakeuchiᚑshog
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalONewLogin2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewLogin(ctx context.Context, v interface{}) (*types.NewLogin, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputNewLogin(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalONewReports2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋgraphqlᚋtypesᚐNewReports(ctx context.Context, v interface{}) (*types.NewReports, error) {
 	if v == nil {
 		return nil, nil
@@ -16590,6 +16674,13 @@ func (ec *executionContext) unmarshalOUpdateUsers2ᚖgithubᚗcomᚋtakeuchiᚑs
 	}
 	res, err := ec.unmarshalInputUpdateUsers(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOUsers2ᚖgithubᚗcomᚋtakeuchiᚑshogoᚋk8sᚑgoᚑsampleᚋdomainᚋmodelsᚐUsers(ctx context.Context, sel ast.SelectionSet, v *models.Users) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Users(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

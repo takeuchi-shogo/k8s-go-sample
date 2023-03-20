@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"context"
-	"log"
 
+	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/helpers"
@@ -25,17 +25,17 @@ func NewAuthorizeGraphqlController(db repositories.DB, jwt gateways.Jwt) *Author
 	}
 }
 
-func (controller *AuthorizeGraphqlController) Login(ctx context.Context, email, password string) error {
-	token, res := controller.Interactor.Login(email, password)
+func (controller *AuthorizeGraphqlController) Login(ctx context.Context, email, password string) (*models.Users, error) {
+	token, user, res := controller.Interactor.Login(email, password)
 	if res.Error != nil {
-		return helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+		return &models.Users{}, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
 
 	gc, err := helpers.GinContextFromContext(ctx)
 	if err != nil {
-		return err
+		return &models.Users{}, err
 	}
 	gc.Header("Authorization", "Bearer "+token)
-	log.Println("4")
-	return nil
+
+	return user, nil
 }

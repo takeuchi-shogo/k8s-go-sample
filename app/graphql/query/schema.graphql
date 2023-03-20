@@ -16,6 +16,7 @@ type Blocks {
   id: ID!
   blocking: Int!
   blocked: Int!
+  blocked_user: Users
 }
 
 type Likes {
@@ -220,16 +221,17 @@ input UpdateAccounts {
   id: Int
   phone_number: String
   email: String
-  new_passwored: String
+  current_password: String
+  new_password: String
 }
 
 input UpdateUsers {
-  # id: Int!
-  display_name: String!
-  # screen_name: String!
+  id: Int
+  display_name: String
+  screen_name: String
   gender: String!
-  age: Int!
-  location: String!
+  age: Int
+  location: String
 }
 
 input UpdateUserProfiles {
@@ -237,7 +239,7 @@ input UpdateUserProfiles {
   user_id: Int
 	introduction: String
 
-	# height_id: Int
+	height: Int
 	body_type_id: Int
 	blood_type_id: Int
 	residence_country_id: Int
@@ -284,7 +286,7 @@ type Mutation {
   createBlock(input: NewBlocks): Blocks!
   createLike(input: NewLikes): Likes!
   createReport(input: NewReports): Reports!
-  login(input: NewLogin): Users!
+  login(email: String!, password: String!): Users!
   createUser(input: NewUsers): Users!
   createUserSearchFilters(input: NewUserSearchFilters): UserSearchFilters!
   updateUserSearchFilters(input: UpdateUserSearchFilters): UserSearchFilters!
