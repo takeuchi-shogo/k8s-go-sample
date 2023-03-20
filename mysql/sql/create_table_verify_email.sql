@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS `verify_emails` (
 	`pin_code` varchar(255) NOT NULL,
 	`expire_at` int UNSIGNED NOT NULL,
 	`created_at` int UNSIGNED NOT NULL,
-	UNIQUE(`token`)
+	UNIQUE(`token`),
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

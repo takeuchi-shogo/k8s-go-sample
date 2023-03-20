@@ -29,10 +29,13 @@ func NewUsersGraphqlController(db repositories.DB, jwt gateways.Jwt) *UsersGraph
 		Interactor: interactor.UserInteractor{
 			AccountRepository:          &repositories.AccountRepository{},
 			DBRepository:               &repositories.DBRepository{DB: db},
+			LikeRepository:             &repositories.LikeRepository{},
 			UserRepository:             &repositories.UserRepository{},
+			UserProfileRepository:      &repositories.UserProfileRepository{},
 			UserSearchFilterRepository: &repositories.UserSearchFilterRepository{},
 			UserPresenter:              &presenters.UsersPresenter{},
 			VerifyEmailRepository:      &repositories.VerifyEmailRepository{},
+			UserProfilePresenter:       &presenters.UserPriflesPresenter{},
 		},
 	}
 }
@@ -66,8 +69,22 @@ func (controller *UsersGraphqlController) GetList(ctx context.Context, first int
 	return users, nil
 }
 
-func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*models.Users, error) {
-	user, res := controller.Interactor.Get(id)
+func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*models.ResponseUsers, error) {
+	gc, err := helpers.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	token := gc.GetHeader("authorization")
+	if token == "" {
+		return nil, helpers.GraphQLErrorResponse(ctx, errors.New("ログインしてください"), 401)
+	}
+
+	userID, res := controller.Authorize.Verify(token)
+	if res.Error != nil {
+		return nil, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+	}
+	user, res := controller.Interactor.Get(userID, id)
 	if res.Error != nil {
 		return user, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
@@ -81,6 +98,22 @@ func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*mod
 }
 
 func (controller *UsersGraphqlController) Patch(ctx context.Context, user *models.Users) (*models.Users, error) {
+	gc, err := helpers.GinContextFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	token := gc.GetHeader("authorization")
+	if token == "" {
+		return nil, helpers.GraphQLErrorResponse(ctx, errors.New("ログインしてください"), 401)
+	}
+
+	userID, res := controller.Authorize.Verify(token)
+	if res.Error != nil {
+		return nil, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
+	}
+	user.ID = userID
+
 	updatedUser, res := controller.Interactor.Save(user)
 	if res.Error != nil {
 		return user, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)

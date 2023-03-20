@@ -1,0 +1,80 @@
+type ResponseUserProfiles {
+	user_id: Int!
+	purpose: String
+	introduction: String
+
+	height_id: Int!
+	height: String!
+	body_type_id: Int!
+	body_type: String!
+	blood_type_id: Int!
+	blood_type: String!
+	residence_country_id: Int!
+	residence_country: String!
+	residence_state_id: Int!
+	residence_state: String!
+	hometown_country_id: Int!
+	hometown_country: String!
+	hometown_state_id: Int!
+	hometown_state: String!
+	occupation_id: Int!
+	occupation: String!
+	education_id: Int!
+	education: String!
+	annual_income_id: Int!
+	annual_income: String!
+	smoking_id: Int!
+	smoking: String!
+	drinking_id: Int!
+	drinking: String!
+
+	siblings_id: Int!
+	siblings: String!
+	language_id: Int!
+	language: String
+	interests_id: Int!
+	interests: String!
+	looking_for_id: Int!
+	looking_for: String!
+
+	school_name: String!
+	job_title: String!
+
+	marital_history_id: Int!
+	marital_history: String!
+	presence_of_children_id: Int!
+	presence_of_children: String!
+	intentions_towards_marriage_id: Int!
+	intentions_towards_marriage: String!
+	desire_for_children_id: Int!
+	desire_for_children: String!
+	household_chores_and_child_rearing_id: Int!
+	household_chores_and_child_rearing: String!
+	meeting_preference_id: Int!
+	meeting_preference: String!
+	dating_expenses_id: Int!
+	dating_expenses: String!
+
+	personality_type_id: Int!
+	personality_type: String!
+	sociability_id: Int!
+	sociability: String!
+	roommates_id: Int!
+	roommates: String!
+	days_off_id: Int!
+	days_off: String!
+	hobbies_id: Int!
+	hobbies: String!
+}
+
+type ResponseUsers {
+	id: ID!
+	uuid: String!
+	display_name: String!
+	screen_name: String!
+	age: Int!
+	gender: String!
+	location: String!
+	user_profile: ResponseUserProfiles!
+	is_liked: Boolean
+}

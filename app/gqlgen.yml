@@ -1,6 +1,6 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqlqls
 schema:
-  - graphql/query/*.graphqls
+  - graphql/query/*.graphql
 
 # Where should the generated server code go?
 exec:
@@ -62,6 +62,12 @@ models:
   Reports:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.Reports"
+  ResponseUserProfiles:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.ResponseUserProfiles"
+  ResponseUsers:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.ResponseUsers"
   UserProfiles:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.UserProfiles"

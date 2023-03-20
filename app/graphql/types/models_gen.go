@@ -61,31 +61,67 @@ type PageInfo struct {
 }
 
 type UpdateAccounts struct {
-	ID          int    `json:"id"`
-	PhoneNumber string `json:"phone_number"`
-	Email       string `json:"email"`
-	Password    string `json:"password"`
+	ID           *int    `json:"id"`
+	PhoneNumber  *string `json:"phone_number"`
+	Email        *string `json:"email"`
+	NewPasswored *string `json:"new_passwored"`
 }
 
 type UpdateUserProfiles struct {
-	ID           string `json:"id"`
-	UserID       int    `json:"user_id"`
-	Introduction string `json:"introduction"`
-	Interests    string `json:"interests"`
-	LookingFor   string `json:"looking_for"`
+	ID                               string  `json:"id"`
+	UserID                           *int    `json:"user_id"`
+	Introduction                     *string `json:"introduction"`
+	BodyTypeID                       *int    `json:"body_type_id"`
+	BloodTypeID                      *int    `json:"blood_type_id"`
+	ResidenceCountryID               *int    `json:"residence_country_id"`
+	ResidenceStateID                 *int    `json:"residence_state_id"`
+	HometownCountryID                *int    `json:"hometown_country_id"`
+	HometownStateID                  *int    `json:"hometown_state_id"`
+	OccupationID                     *int    `json:"occupation_id"`
+	EducationID                      *int    `json:"education_id"`
+	AnnualIncomeID                   *int    `json:"annual_income_id"`
+	SmokingID                        *int    `json:"smoking_id"`
+	DrinkingID                       *int    `json:"drinking_id"`
+	SiblingsID                       *int    `json:"siblings_id"`
+	LanguageID                       *int    `json:"language_id"`
+	InterestsID                      *int    `json:"interests_id"`
+	LookingForID                     *int    `json:"looking_for_id"`
+	SchoolName                       *string `json:"school_name"`
+	JobTitle                         *string `json:"job_title"`
+	MaritalHistoryID                 *int    `json:"marital_history_id"`
+	PresenceOfChildrenID             *int    `json:"presence_of_children_id"`
+	IntentionsTowardsMarriageID      *int    `json:"intentions_towards_marriage_id"`
+	DesireForChildrenID              *int    `json:"desire_for_children_id"`
+	HouseholdChoresAndChildRearingID *int    `json:"household_chores_and_child_rearing_id"`
+	MeetingPreferenceID              *int    `json:"meeting_preference_id"`
+	DatingExpensesID                 *int    `json:"dating_expenses_id"`
+	PersonalityTypeID                *int    `json:"personality_type_id"`
+	SociabilityID                    *int    `json:"sociability_id"`
+	RoommatesID                      *int    `json:"roommates_id"`
+	DaysOffID                        *int    `json:"days_off_id"`
+	HobbiesID                        *int    `json:"hobbies_id"`
 }
 
 type UpdateUserSearchFilters struct {
-	ID       string  `json:"id"`
-	Gender   *string `json:"gender"`
-	Location *string `json:"location"`
+	ID              string  `json:"id"`
+	Gender          *string `json:"gender"`
+	Location        *string `json:"location"`
+	Purpose         int     `json:"purpose"`
+	HasIntroduction bool    `json:"has_introduction"`
+	HeightID        int     `json:"height_id"`
+	BodyTypeID      int     `json:"body_type_id"`
+	BloodTypeID     int     `json:"blood_type_id"`
+	OccupationID    int     `json:"occupation_id"`
+	EducationID     int     `json:"education_id"`
+	AnnualIncomeID  int     `json:"annual_income_id"`
+	SmokingID       int     `json:"smoking_id"`
+	DrinkingID      int     `json:"drinking_id"`
 }
 
 type UpdateUsers struct {
-	ID          int    `json:"id"`
 	DisplayName string `json:"display_name"`
-	ScreenName  string `json:"screen_name"`
 	Gender      string `json:"gender"`
+	Age         int    `json:"age"`
 	Location    string `json:"location"`
 }
 
@@ -95,6 +131,6 @@ type UserConnection struct {
 }
 
 type UserEdge struct {
-	Cursor string        `json:"cursor"`
-	Node   *models.Users `json:"node"`
+	Cursor string                `json:"cursor"`
+	Node   *models.ResponseUsers `json:"node"`
 }

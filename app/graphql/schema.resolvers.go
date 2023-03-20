@@ -34,16 +34,6 @@ func (r *blocksResolver) Blocked(ctx context.Context, obj *models.Blocks) (int, 
 	panic(fmt.Errorf("not implemented: Blocked - blocked"))
 }
 
-// SendUserID is the resolver for the send_user_id field.
-func (r *likesResolver) SendUserID(ctx context.Context, obj *models.Likes) (int, error) {
-	panic(fmt.Errorf("not implemented: SendUserID - send_user_id"))
-}
-
-// ReceiveUserID is the resolver for the receive_user_id field.
-func (r *likesResolver) ReceiveUserID(ctx context.Context, obj *models.Likes) (int, error) {
-	panic(fmt.Errorf("not implemented: ReceiveUserID - receive_user_id"))
-}
-
 // CreateAccount is the resolver for the createAccount field.
 func (r *mutationResolver) CreateAccount(ctx context.Context, input *types.NewAccounts) (*models.Accounts, error) {
 	a := &models.Accounts{
@@ -91,7 +81,6 @@ func (r *mutationResolver) CreateReport(ctx context.Context, input *types.NewRep
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input *types.NewLogin) (*models.Users, error) {
-	fmt.Println("koko")
 	authorizeGraphqlController := controllers.NewAuthorizeGraphqlController(r.DB, r.Jwt)
 	return &models.Users{}, authorizeGraphqlController.Login(ctx, input.Email, input.Password)
 }
@@ -116,9 +105,11 @@ func (r *mutationResolver) CreateUserSearchFilters(ctx context.Context, input *t
 func (r *mutationResolver) UpdateUserSearchFilters(ctx context.Context, input *types.UpdateUserSearchFilters) (*models.UserSearchFilters, error) {
 	id, _ := strconv.Atoi(input.ID)
 	usf := &models.UserSearchFilters{
-		ID:       id,
-		Gender:   input.Gender,
-		Location: input.Location,
+		ID:     id,
+		Gender: input.Gender,
+		// Location: input.Location,
+		BodyTypeID:  input.BodyTypeID,
+		BloodTypeID: input.BloodTypeID,
 	}
 	userSearchFiltersGraphqlController := controllers.NewUserSearchFilterGraphqlController(r.DB, r.Jwt)
 
@@ -127,31 +118,38 @@ func (r *mutationResolver) UpdateUserSearchFilters(ctx context.Context, input *t
 
 // UpdateAccount is the resolver for the updateAccount field.
 func (r *mutationResolver) UpdateAccount(ctx context.Context, input *types.UpdateAccounts) (*models.Accounts, error) {
-	account := &models.Accounts{
-		ID:          input.ID,
-		PhoneNumber: input.PhoneNumber,
-		Email:       input.Email,
-		Password:    input.Password,
-	}
+	// account := &models.Accounts{
+	// 	ID:          input.ID,
+	// 	PhoneNumber: input.PhoneNumber,
+	// 	Email:       input.Email,
+	// 	Password:    input.Password,
+	// }
 
 	accountsGraphqlController := controllers.NewAccountsGraphqlController(r.DB, r.Jwt)
 
-	return accountsGraphqlController.Patch(ctx, account)
+	return accountsGraphqlController.Patch(ctx, input)
 }
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error) {
 	user := &models.Users{
-		ID:          input.ID,
+		// ID:          input.ID,
 		DisplayName: input.DisplayName,
-		ScreenName:  input.ScreenName,
-		Gender:      input.Gender,
-		Location:    input.Location,
+		// ScreenName:  input.ScreenName,
+		Gender:   input.Gender,
+		Age:      input.Age,
+		Location: input.Location,
 	}
 
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
 	return usersGraphqlController.Patch(ctx, user)
+}
+
+// UpdateUserProfile is the resolver for the updateUserProfile field.
+func (r *mutationResolver) UpdateUserProfile(ctx context.Context, input *types.UpdateUserProfiles) (*models.UserProfiles, error) {
+	userProfilesGraphqlController := controllers.NewUserProfilesGraphqlController(r.DB)
+	return userProfilesGraphqlController.Patch(ctx, input)
 }
 
 // CreateVerifyEmail is the resolver for the createVerifyEmail field.
@@ -181,7 +179,7 @@ func (r *queryResolver) Block(ctx context.Context, id string) (*models.Blocks, e
 }
 
 // Me is the resolver for the me field.
-func (r *queryResolver) Me(ctx context.Context) (*models.Users, error) {
+func (r *queryResolver) Me(ctx context.Context) (*models.ResponseUsers, error) {
 	meGraphqlController := controllers.NewMeGraphqlController(r.DB, r.Jwt)
 
 	return meGraphqlController.Get(ctx)
@@ -204,7 +202,7 @@ func (r *queryResolver) Users(ctx context.Context, first int, after string) (*ty
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id string) (*models.Users, error) {
+func (r *queryResolver) User(ctx context.Context, id string) (*models.ResponseUsers, error) {
 	ids, _ := strconv.Atoi(id)
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
@@ -225,6 +223,26 @@ func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*models.V
 	return verifyEmailsGraphqlController.Get(ctx, code)
 }
 
+// ResidenceID is the resolver for the residence_id field.
+func (r *userProfilesResolver) ResidenceID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: ResidenceID - residence_id"))
+}
+
+// HometownID is the resolver for the hometown_id field.
+func (r *userProfilesResolver) HometownID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: HometownID - hometown_id"))
+}
+
+// IndealFirstEncointerID is the resolver for the indeal_first_encointer_id field.
+func (r *userProfilesResolver) IndealFirstEncointerID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: IndealFirstEncointerID - indeal_first_encointer_id"))
+}
+
+// PresonalityTypeID is the resolver for the presonality_type_id field.
+func (r *userProfilesResolver) PresonalityTypeID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: PresonalityTypeID - presonality_type_id"))
+}
+
 // IsVerifiedEmail is the resolver for the is_verified_email field.
 func (r *usersResolver) IsVerifiedEmail(ctx context.Context, obj *models.Users) (bool, error) {
 	panic(fmt.Errorf("not implemented: IsVerifiedEmail - is_verified_email"))
@@ -236,23 +254,23 @@ func (r *Resolver) Accounts() AccountsResolver { return &accountsResolver{r} }
 // Blocks returns BlocksResolver implementation.
 func (r *Resolver) Blocks() BlocksResolver { return &blocksResolver{r} }
 
-// Likes returns LikesResolver implementation.
-func (r *Resolver) Likes() LikesResolver { return &likesResolver{r} }
-
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// UserProfiles returns UserProfilesResolver implementation.
+func (r *Resolver) UserProfiles() UserProfilesResolver { return &userProfilesResolver{r} }
+
 // Users returns UsersResolver implementation.
 func (r *Resolver) Users() UsersResolver { return &usersResolver{r} }
 
 type accountsResolver struct{ *Resolver }
 type blocksResolver struct{ *Resolver }
-type likesResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userProfilesResolver struct{ *Resolver }
 type usersResolver struct{ *Resolver }
 
 // !!! WARNING !!!
@@ -261,6 +279,15 @@ type usersResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *likesResolver) SendUserID(ctx context.Context, obj *models.Likes) (int, error) {
+	panic(fmt.Errorf("not implemented: SendUserID - send_user_id"))
+}
+func (r *likesResolver) ReceiveUserID(ctx context.Context, obj *models.Likes) (int, error) {
+	panic(fmt.Errorf("not implemented: ReceiveUserID - receive_user_id"))
+}
+
+type likesResolver struct{ *Resolver }
+
 func (r *usersResolver) ScreenName(ctx context.Context, obj *models.Users) (string, error) {
 	panic(fmt.Errorf("not implemented: ScreenName - screen_name"))
 }

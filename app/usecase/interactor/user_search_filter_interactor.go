@@ -42,6 +42,21 @@ func (interactor *UserSearchFilterInteractor) Save(filter *models.UserSearchFilt
 
 	f.Gender = filter.Gender
 	f.Location = filter.Location
+	f.Purpose = filter.Purpose
+	f.HasIntroduction = filter.HasIntroduction
+	f.HeightID = filter.HeightID
+	f.BodyTypeID = filter.BodyTypeID
+	f.BloodTypeID = filter.BloodTypeID
+	// f.ResidenceCountryID = filter.ResidenceCountryID
+	// f.ResidenceStateID = filter.ResidenceStateID
+	// f.HometownCountryID = filter.HometownCountryID
+	// f.HometownStateID = filter.HometownStateID
+	f.OccupationID = filter.OccupationID
+	f.EducationID = filter.EducationID
+	f.AnnualIncomeID = filter.AnnualIncomeID
+	f.SmokingID = filter.SmokingID
+	f.DrinkingID = filter.DrinkingID
+
 	f.UpdatedAt = time.Now().Unix()
 
 	updatedFilter, err := interactor.UserSearchFilter.Save(db, f)

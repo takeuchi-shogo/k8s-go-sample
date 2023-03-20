@@ -15,10 +15,14 @@ import (
 type UserInteractor struct {
 	AccountRepository          repository.AccountRepository
 	DBRepository               repository.DBRepository
+	LikeRepository             repository.LikeRepository
 	UserRepository             repository.UserRepository
+	UserProfileRepository      repository.UserProfileRepository
 	UserPresenter              presenter.UserPresenter
 	UserSearchFilterRepository repository.UserSearchFilterRepository
 	VerifyEmailRepository      repository.VerifyEmailRepository
+
+	UserProfilePresenter presenter.UserProfilePresenter
 }
 
 func getCursor(user *models.Users) string {
@@ -38,9 +42,21 @@ func (interactor *UserInteractor) GetList(first int, after string, userID int) (
 	edges := []*types.UserEdge{}
 
 	for _, user := range users {
+		profile, _ := interactor.UserProfileRepository.FindByUserID(db, user.ID)
+		ru := &models.ResponseUsers{}
+		ru.ID = user.ID
+		ru.DisplayName = user.DisplayName
+		ru.ScreenName = user.ScreenName
+		ru.Gender = user.Gender
+		ru.Age = user.Age
+
+		builtProfile := interactor.UserProfilePresenter.ResponseUserProfile(profile)
+
+		ru.UserProfile = builtProfile
+		builtUser := interactor.UserPresenter.ResponseUser(ru)
 		userEdge := &types.UserEdge{
 			Cursor: getCursor(user),
-			Node:   user,
+			Node:   builtUser,
 		}
 		edges = append(edges, userEdge)
 	}
@@ -64,14 +80,35 @@ func (interactor *UserInteractor) GetList(first int, after string, userID int) (
 	}, services.NewResultStatus(http.StatusOK, nil)
 }
 
-func (interactor *UserInteractor) Get(id int) (*models.Users, *services.ResultStatus) {
+func (interactor *UserInteractor) Get(id, userID int) (*models.ResponseUsers, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
 
-	user, err := interactor.UserRepository.FindByID(db, id)
+	user, err := interactor.UserRepository.FindByID(db, userID)
 	if err != nil {
-		return &models.Users{}, services.NewResultStatus(http.StatusNotFound, err)
+		return &models.ResponseUsers{}, services.NewResultStatus(http.StatusNotFound, err)
 	}
-	return interactor.UserPresenter.ResponseUser(user), services.NewResultStatus(http.StatusOK, nil)
+
+	ru := &models.ResponseUsers{
+		ID:          user.ID,
+		UUID:        user.UUID,
+		DisplayName: user.DisplayName,
+		ScreenName:  user.ScreenName,
+		Age:         user.Age,
+		Gender:      user.Gender,
+		Location:    user.Location,
+	}
+
+	if _, err := interactor.LikeRepository.FindBySendUserIDAndReceiveUserID(db, id, userID); err == nil {
+		ru.IsLiked = true
+	}
+
+	profile, _ := interactor.UserProfileRepository.FindByUserID(db, user.ID)
+
+	builtProfile := interactor.UserProfilePresenter.ResponseUserProfile(profile)
+
+	ru.UserProfile = builtProfile
+
+	return ru, services.NewResultStatus(http.StatusOK, nil)
 }
 
 func (interactor *UserInteractor) Create(u *models.Users, accountID int, code string) (*models.Users, *services.ResultStatus) {
@@ -99,8 +136,9 @@ func (interactor *UserInteractor) Create(u *models.Users, accountID int, code st
 
 func setValue(user, foundUser *models.Users) *models.Users {
 	foundUser.DisplayName = user.DisplayName
-	foundUser.ScreenName = user.ScreenName
+	// foundUser.ScreenName = user.ScreenName
 	foundUser.Gender = user.Gender
+	foundUser.Age = user.Age
 	foundUser.Location = user.Location
 	foundUser.UpdatedAt = time.Now().Unix()
 

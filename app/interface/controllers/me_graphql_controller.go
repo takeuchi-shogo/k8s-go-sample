@@ -14,7 +14,7 @@ import (
 
 type MeGraphqlController struct {
 	Authorize  interactor.AuthorizeInteractor
-	Interactor interactor.UserInteractor
+	Interactor interactor.MeInteractor
 }
 
 func NewMeGraphqlController(db repositories.DB, jwt gateways.Jwt) *MeGraphqlController {
@@ -25,17 +25,17 @@ func NewMeGraphqlController(db repositories.DB, jwt gateways.Jwt) *MeGraphqlCont
 			Jwt:               &gateways.JwtGateway{Jwt: jwt},
 			UserRepository:    &repositories.UserRepository{},
 		},
-		Interactor: interactor.UserInteractor{
-			AccountRepository:     &repositories.AccountRepository{},
-			DBRepository:          &repositories.DBRepository{DB: db},
-			UserRepository:        &repositories.UserRepository{},
-			UserPresenter:         &presenters.UsersPresenter{},
-			VerifyEmailRepository: &repositories.VerifyEmailRepository{},
+		Interactor: interactor.MeInteractor{
+			DB:                   &repositories.DBRepository{DB: db},
+			Like:                 &repositories.LikeRepository{},
+			User:                 &repositories.UserRepository{},
+			UserProfile:          &repositories.UserProfileRepository{},
+			UserProfilePresenter: &presenters.UserPriflesPresenter{},
 		},
 	}
 }
 
-func (controller *MeGraphqlController) Get(ctx context.Context) (*models.Users, error) {
+func (controller *MeGraphqlController) Get(ctx context.Context) (*models.ResponseUsers, error) {
 
 	gc, err := helpers.GinContextFromContext(ctx)
 	if err != nil {

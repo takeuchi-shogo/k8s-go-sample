@@ -3,7 +3,6 @@ package middleware
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -34,7 +33,6 @@ func NewJwtAuth(c *config.Config) *Jwt {
 
 // Create json web token
 func (j *Jwt) CreateToken(userID int) string {
-	log.Println("6", userID, j.ApplicationName, j.TokenExpireAt)
 	claim := &jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(time.Hour * time.Duration(j.TokenExpireAt)).Unix(),
 		Issuer:    j.ApplicationName,
@@ -48,6 +46,9 @@ func (j *Jwt) CreateToken(userID int) string {
 	tokenString, _ := token.SignedString([]byte(j.SecretKey))
 	return tokenString
 }
+
+// Create refreshToken
+//.....
 
 // Parse json web token
 func (j *Jwt) ParseToken(jwtToken string) (jwt.MapClaims, error) {
