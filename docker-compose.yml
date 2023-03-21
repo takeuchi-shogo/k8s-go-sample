@@ -52,7 +52,6 @@ services:
             - PMA_HOST=mysql
             - PMA_USER=root
             - PMA_PASSWORD=password
-            # - VIRTUAL_HOST=phpmyadmin.ticketvillage.leadi
         networks:
             - k8s-sample-go-network
 
