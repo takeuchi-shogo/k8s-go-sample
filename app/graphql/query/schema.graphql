@@ -130,6 +130,14 @@ type Users {
   is_verified_age: Boolean!
 }
 
+type ResetPasswords {
+  id: ID!
+  user_id: Int!
+  token: String!
+  reset_key: String!
+  expire_at: Int!
+}
+
 type VerifyEmails {
   id: ID!
   email: String!
@@ -156,6 +164,8 @@ type Query {
   user_search_filters: UserSearchFilters!
 
   verify_email(code: String!): VerifyEmails!
+
+  reset_password(token: String!): ResetPasswords!
 }
 
 # ========== input ==========
@@ -277,6 +287,8 @@ input UpdateUserProfiles {
 
 input NewVerifyEmails {
   email: String!
+  token: String!
+  pin_code: String!
 }
 
 # ========== mutation ==========
@@ -293,5 +305,8 @@ type Mutation {
   updateAccount(input: UpdateAccounts): Accounts!
   updateUser(input: UpdateUsers): Users!
   updateUserProfile(input: UpdateUserProfiles): UserProfiles!
-  createVerifyEmail(input: NewVerifyEmails): VerifyEmails!
+  createVerifyEmail(email: String!): VerifyEmails!
+
+  createResetPassword(email: String!): ResetPasswords!
+  updateResetPassword(reset_key: String!, password: String!): Users!
 }

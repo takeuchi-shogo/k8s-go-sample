@@ -38,6 +38,19 @@ func RandomString(n int) string {
 	return sb.String()
 }
 
+// Random Token generates a random string of length n
+func RandomToken(n int) string {
+	var sb strings.Builder
+	k := len(keyword)
+
+	for i := 0; i < n; i++ {
+		c := keyword[rand.Intn(k)]
+		sb.WriteByte(c)
+	}
+
+	return sb.String()
+}
+
 // RandomScreenName id generates a random string of length n
 func RandomScreenNameID(n int) string {
 	var sb strings.Builder

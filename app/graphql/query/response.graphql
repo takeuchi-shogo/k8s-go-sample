@@ -4,7 +4,6 @@ type ResponseUserProfiles {
 	introduction: String
 
 	height: Int!
-	# height: String!
 	body_type_id: Int!
 	body_type: String!
 	blood_type_id: Int!
@@ -37,8 +36,8 @@ type ResponseUserProfiles {
 	looking_for_id: Int!
 	looking_for: String!
 
-	school_name: String!
-	job_title: String!
+	school_name: String
+	job_title: String
 
 	marital_history_id: Int!
 	marital_history: String!

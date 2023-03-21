@@ -50,7 +50,9 @@ type NewUsers struct {
 }
 
 type NewVerifyEmails struct {
-	Email string `json:"email"`
+	Email   string `json:"email"`
+	Token   string `json:"token"`
+	PinCode string `json:"pin_code"`
 }
 
 type PageInfo struct {

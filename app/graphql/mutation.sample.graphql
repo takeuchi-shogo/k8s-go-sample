@@ -20,7 +20,28 @@ mutation Login($email: String!, $password: String!) {
 
 mutation UpdateAccount($account: UpdateAccounts) {
 	updateAccount(account: $account) {
-		account
+		
 	}
 }
 
+mutation UpdateUser($user: UpdateUsers) {
+	updateUser(user: $user) {
+		display_name
+		screen_name
+		age
+	}
+}
+
+mutation UpdateUserSearchFilter($filter: UpdateUserSearchFilters) {
+	updateUserSearchFilters(filter: $filter) {
+		...
+	}
+}
+
+mutation NewVerifyEmails($email: NewVerifyEmails) {
+	createVerifyEmail(email: $email) {
+		email
+		token
+		pin_code
+	}
+}

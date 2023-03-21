@@ -41,6 +41,9 @@ func setBasicProfile(p *models.UserProfiles) *models.ResponseUserProfiles {
 		InterestsID:  p.InterestsID,
 		LookingForID: p.LookingForID,
 
+		SchoolName: p.SchoolName,
+		JobTitle:   p.JobTitle,
+
 		MaritalHistoryID:                 p.MaritalHistoryID,
 		PresenceOfChildrenID:             p.PresenceOfChildrenID,
 		IntentionsTowardsMarriageID:      p.IntentionsTowardsMarriageID,

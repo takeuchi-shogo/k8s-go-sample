@@ -158,10 +158,22 @@ func (r *mutationResolver) UpdateUserProfile(ctx context.Context, input *types.U
 }
 
 // CreateVerifyEmail is the resolver for the createVerifyEmail field.
-func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*models.VerifyEmails, error) {
+func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, email string) (*models.VerifyEmails, error) {
 	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
 
-	return verifyEmailsGraphqlController.Post(ctx, input.Email)
+	return verifyEmailsGraphqlController.Post(ctx, email)
+}
+
+// CreateResetPassword is the resolver for the createResetPassword field.
+func (r *mutationResolver) CreateResetPassword(ctx context.Context, email string) (*models.ResetPasswords, error) {
+	resetPasswordsGraphqlController := controllers.NewResetPasswordsGraphqlController(r.DB)
+	return resetPasswordsGraphqlController.Create(ctx, email)
+}
+
+// UpdateResetPassword is the resolver for the updateResetPassword field.
+func (r *mutationResolver) UpdateResetPassword(ctx context.Context, resetKey string, password string) (*models.Users, error) {
+	resetPasswordsGraphqlController := controllers.NewResetPasswordsGraphqlController(r.DB)
+	return resetPasswordsGraphqlController.Save(ctx, resetKey, password)
 }
 
 // Account is the resolver for the account field.
@@ -226,6 +238,12 @@ func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*models.V
 	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
 
 	return verifyEmailsGraphqlController.Get(ctx, code)
+}
+
+// ResetPassword is the resolver for the reset_password field.
+func (r *queryResolver) ResetPassword(ctx context.Context, token string) (*models.ResetPasswords, error) {
+	resetPasswordsGraphqlController := controllers.NewResetPasswordsGraphqlController(r.DB)
+	return resetPasswordsGraphqlController.Get(ctx, token)
 }
 
 // HeightID is the resolver for the height_id field.

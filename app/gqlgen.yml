@@ -68,6 +68,9 @@ models:
   ResponseUsers:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.ResponseUsers"
+  ResetPasswords:
+    model:
+      - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.ResetPasswords"
   UserProfiles:
     model:
       - "github.com/takeuchi-shogo/k8s-go-sample/domain/models.UserProfiles"
