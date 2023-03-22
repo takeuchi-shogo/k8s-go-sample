@@ -28,9 +28,7 @@ query {
 		screen_name
 		display_name
 		age
-		like {
-			id
-		}
+		is_liked
 		# tweet {
 		# 	text
 		# }
@@ -81,5 +79,25 @@ query {
 				display_name
 			}
 		}
+	}
+}
+
+# ブロック機能
+query {
+	blocks {
+		id
+		blocked_id
+		user {
+			screen_name
+			display_name
+		}
+	}
+}
+
+# 通報機能
+# ここは履歴としてリストを返すが迷う（実装しているものは見たことない）
+query {
+	reports {
+		id
 	}
 }

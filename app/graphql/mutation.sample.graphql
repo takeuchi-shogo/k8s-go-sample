@@ -20,7 +20,11 @@ mutation Login($email: String!, $password: String!) {
 
 mutation UpdateAccount($account: UpdateAccounts) {
 	updateAccount(account: $account) {
-		
+		user {
+			display_name
+			screen_name
+			age
+		}
 	}
 }
 
@@ -43,5 +47,43 @@ mutation NewVerifyEmails($email: NewVerifyEmails) {
 		email
 		token
 		pin_code
+	}
+}
+
+# ブロック機能
+mutation NewBlocks($blocked_id: Int!) {
+	createBlock(blocked_id: $blocked_id) {
+		id
+		blocking_id
+		blocked_id
+	}
+}
+
+mutation DeleteBlocks($id: ID!) {
+	deleteBlock(id: $id) {
+
+	}
+}
+
+# 通報機能
+mutation NewReports($reported_id: Int!) {
+	createReport(reported_id: $reported_id) {
+		id
+		reported_id
+		reason
+	}
+}
+
+# 他ユーザーへのいいね機能
+mutation NewUserLikes($receiver_id: Int!) {
+	createLike(receiver_id: $receiver_id) {
+		
+	}
+}
+
+# 呟きへのいいね機能
+mutation NewTweets($tweet_id: Int!) {
+	createTweetLike(tweet_id: $tweet_id) {
+		
 	}
 }
