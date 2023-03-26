@@ -69,7 +69,7 @@ func (controller *UsersGraphqlController) GetList(ctx context.Context, first int
 	return users, nil
 }
 
-func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*models.ResponseUsers, error) {
+func (controller *UsersGraphqlController) Get(ctx context.Context, screenName string) (*models.ResponseUsers, error) {
 	gc, err := helpers.GinContextFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (controller *UsersGraphqlController) Get(ctx context.Context, id int) (*mod
 	if res.Error != nil {
 		return nil, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}
-	user, res := controller.Interactor.Get(userID, id)
+	user, res := controller.Interactor.Get(userID, screenName)
 	if res.Error != nil {
 		return user, helpers.GraphQLErrorResponse(ctx, res.Error, res.Code)
 	}

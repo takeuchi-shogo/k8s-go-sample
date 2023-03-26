@@ -1,7 +1,9 @@
 package models
 
-type Tweets struct {
+type Comments struct {
 	ID        int    `json:"id"`
+	TweetID   int    `json:"tweet_id"`
+	CommentID int    `json:"comment_id"`
 	UserID    int    `json:"user_id"`
 	Text      string `json:"text"`
 	CreatedAt int64  `json:"created_at"`

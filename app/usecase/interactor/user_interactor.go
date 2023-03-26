@@ -80,10 +80,10 @@ func (interactor *UserInteractor) GetList(first int, after string, userID int) (
 	}, services.NewResultStatus(http.StatusOK, nil)
 }
 
-func (interactor *UserInteractor) Get(id, userID int) (*models.ResponseUsers, *services.ResultStatus) {
+func (interactor *UserInteractor) Get(id int, screenName string) (*models.ResponseUsers, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
 
-	user, err := interactor.UserRepository.FindByID(db, userID)
+	user, err := interactor.UserRepository.FirstByScreenName(db, screenName)
 	if err != nil {
 		return &models.ResponseUsers{}, services.NewResultStatus(http.StatusNotFound, err)
 	}
@@ -98,7 +98,7 @@ func (interactor *UserInteractor) Get(id, userID int) (*models.ResponseUsers, *s
 		Location:    user.Location,
 	}
 
-	if _, err := interactor.LikeRepository.FindBySendUserIDAndReceiveUserID(db, id, userID); err == nil {
+	if _, err := interactor.LikeRepository.FindBySendUserIDAndReceiveUserID(db, id, ru.ID); err == nil {
 		ru.IsLiked = true
 	}
 

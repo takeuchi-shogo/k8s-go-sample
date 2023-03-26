@@ -19,6 +19,11 @@ type Blocks {
   blocked_user: Users
 }
 
+type HomeTimeLine {
+  tweets: [Tweets!]
+  metadata: Metadata!
+}
+
 type Likes {
   id: ID!
   send_user_id: Int!
@@ -30,6 +35,11 @@ type Matches {
   id: ID!
   male_user_id: Int!
   female_user_id: Int!
+}
+
+type Metadata {
+  total_tweets_count: Int!
+  page_info: PageInfo!
 }
 
 type Reports {
@@ -44,6 +54,26 @@ type PageInfo {
   has_previous_page: Boolean!
   start_cursor: String
   end_cursor: String
+}
+
+type TweetConnection {
+  edges: [TweetsEdge]
+  page_info: PageInfo!
+}
+
+type TweetsEdge {
+  cursor: String!
+  node: Tweets!
+}
+
+type Tweets {
+  id: ID!
+  text: String!
+  format_created_at: String!
+  is_liked: Boolean!
+  like_cnt: Int!
+  comment_cnt: Int!
+  user: Users!
 }
 
 type UserProfiles {
@@ -157,9 +187,14 @@ type Query {
   reports: [Reports!]!
   report(id: ID!): Reports!
 
+  home(first: Int!, after: String!): HomeTimeLine!
+
+  tweets(user_id: Int!): TweetConnection!
+  tweet(id: ID!): Tweets!
+
   users(first: Int!, after: String!): UserConnection!
   # users: [Users!]!
-  user(id: ID!): ResponseUsers!
+  user(screen_name: String!): ResponseUsers!
 
   user_search_filters: UserSearchFilters!
 
@@ -309,4 +344,6 @@ type Mutation {
 
   createResetPassword(email: String!): ResetPasswords!
   updateResetPassword(reset_key: String!, password: String!): Users!
+
+  createTweet(text: String!): Tweets!
 }

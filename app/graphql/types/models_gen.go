@@ -6,10 +6,20 @@ import (
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 )
 
+type HomeTimeLine struct {
+	Tweets   []*models.Tweets `json:"tweets"`
+	Metadata *Metadata        `json:"metadata"`
+}
+
 type Matches struct {
 	ID           string `json:"id"`
 	MaleUserID   int    `json:"male_user_id"`
 	FemaleUserID int    `json:"female_user_id"`
+}
+
+type Metadata struct {
+	TotalTweetsCount int       `json:"total_tweets_count"`
+	PageInfo         *PageInfo `json:"page_info"`
 }
 
 type NewAccounts struct {
@@ -60,6 +70,16 @@ type PageInfo struct {
 	HasPreviousPage bool    `json:"has_previous_page"`
 	StartCursor     *string `json:"start_cursor"`
 	EndCursor       *string `json:"end_cursor"`
+}
+
+type TweetConnection struct {
+	Edges    []*TweetsEdge `json:"edges"`
+	PageInfo *PageInfo     `json:"page_info"`
+}
+
+type TweetsEdge struct {
+	Cursor string         `json:"cursor"`
+	Node   *models.Tweets `json:"node"`
 }
 
 type UpdateAccounts struct {

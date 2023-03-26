@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
@@ -10,6 +11,29 @@ import (
 )
 
 type TweetRepository struct{}
+
+func (r *TweetRepository) Find(db *gorm.DB) ([]*models.Tweets, error) {
+	t := []*models.Tweets{}
+	if err := db.Order("created_at desc").Limit(10).Find(&t).Error; !errors.Is(err, nil) {
+		return []*models.Tweets{}, fmt.Errorf("failed get tweet list: %w\n", err)
+	}
+	return t, nil
+}
+
+func (r *TweetRepository) FindByCursor(db *gorm.DB, first int, after string) ([]*models.Tweets, error) {
+	t := []*models.Tweets{}
+
+	query := db.Order("created_at desc")
+
+	if after != "" {
+		id, _ := strconv.Atoi(after)
+		query = query.Where("id < ?", id)
+	}
+	if err := query.Limit(first).Find(&t).Error; !errors.Is(err, nil) {
+		return []*models.Tweets{}, fmt.Errorf("failed get tweet list: %w\n", err)
+	}
+	return t, nil
+}
 
 func (r *TweetRepository) TakeByID(db *gorm.DB, id int) (*models.Tweets, error) {
 	t := &models.Tweets{}
@@ -21,8 +45,11 @@ func (r *TweetRepository) TakeByID(db *gorm.DB, id int) (*models.Tweets, error) 
 
 func (r *TweetRepository) FindByUserID(db *gorm.DB, userID int) ([]*models.Tweets, error) {
 	t := []*models.Tweets{}
-	if err := db.Where("usre_id = ?", userID).Find(&t).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+	if err := db.Where("user_id = ?", userID).Find(&t).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 		return []*models.Tweets{}, fmt.Errorf("failed get tweet list: %w\n", err)
+	}
+	if len(t) <= 0 {
+		return []*models.Tweets{}, fmt.Errorf("failed get tweet list: リストがありません")
 	}
 	return t, nil
 }
@@ -36,6 +63,7 @@ func (r *TweetRepository) LastByUserID(db *gorm.DB, userID int) (*models.Tweets,
 }
 
 func (r *TweetRepository) Create(db *gorm.DB, tweet *models.Tweets) (*models.Tweets, error) {
+	fmt.Printf("%+v\n", tweet)
 	if err := db.Create(tweet).Error; errors.Is(err, gorm.ErrRegistered) {
 		return &models.Tweets{}, fmt.Errorf("failed create tweet: %w\n", err)
 	}
