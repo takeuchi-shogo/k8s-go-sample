@@ -2,7 +2,6 @@ package interactor
 
 import (
 	"errors"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -65,27 +64,26 @@ func (interactor *AuthorizeInteractor) Create(user *models.Users) (auth AuthToke
 	return AuthToken{JwtToken: token, User: foundUser}, services.NewResultStatus(200, nil)
 }
 
-func (interactor *AuthorizeInteractor) Login(email, password string) (string, *services.ResultStatus) {
+func (interactor *AuthorizeInteractor) Login(email, password string) (string, *models.Users, *services.ResultStatus) {
 	db := interactor.DBRepository.Connect()
 
 	foundAccount, err := interactor.AccountRepository.FirstByEmail(db, email)
 	if err != nil {
-		return "", services.NewResultStatus(400, err)
+		return "", &models.Users{}, services.NewResultStatus(400, err)
 	}
 
 	if err = utils.CheckPassword(password, foundAccount.Password); err != nil {
-		return "", services.NewResultStatus(400, err)
+		return "", &models.Users{}, services.NewResultStatus(400, err)
 	}
 
 	foundUser, err := interactor.UserRepository.FirstByAccountID(db, foundAccount.ID)
 	if err != nil {
-		return "", services.NewResultStatus(400, err)
+		return "", &models.Users{}, services.NewResultStatus(400, err)
 	}
 
 	token := interactor.Jwt.CreateToken(foundUser.ID)
-	log.Println("5")
 
-	return token, services.NewResultStatus(200, nil)
+	return token, foundUser, services.NewResultStatus(200, nil)
 }
 
 func isTokenExpire(expireAt int64) bool {

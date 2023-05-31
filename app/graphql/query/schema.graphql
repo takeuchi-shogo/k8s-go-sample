@@ -16,6 +16,12 @@ type Blocks {
   id: ID!
   blocking: Int!
   blocked: Int!
+  blocked_user: Users
+}
+
+type HomeTimeLine {
+  tweets: [Tweets!]
+  metadata: Metadata!
 }
 
 type Likes {
@@ -31,6 +37,11 @@ type Matches {
   female_user_id: Int!
 }
 
+type Metadata {
+  total_tweets_count: Int!
+  page_info: PageInfo!
+}
+
 type Reports {
   id: ID!
   reporter_id: Int!
@@ -43,6 +54,26 @@ type PageInfo {
   has_previous_page: Boolean!
   start_cursor: String
   end_cursor: String
+}
+
+type TweetConnection {
+  edges: [TweetsEdge]
+  page_info: PageInfo!
+}
+
+type TweetsEdge {
+  cursor: String!
+  node: Tweets!
+}
+
+type Tweets {
+  id: ID!
+  text: String!
+  format_created_at: String!
+  is_liked: Boolean!
+  like_cnt: Int!
+  comment_cnt: Int!
+  user: Users!
 }
 
 type UserProfiles {
@@ -129,6 +160,14 @@ type Users {
   is_verified_age: Boolean!
 }
 
+type ResetPasswords {
+  id: ID!
+  user_id: Int!
+  token: String!
+  reset_key: String!
+  expire_at: Int!
+}
+
 type VerifyEmails {
   id: ID!
   email: String!
@@ -148,13 +187,20 @@ type Query {
   reports: [Reports!]!
   report(id: ID!): Reports!
 
+  home(first: Int!, after: String!): HomeTimeLine!
+
+  tweets(user_id: Int!): TweetConnection!
+  tweet(id: ID!): Tweets!
+
   users(first: Int!, after: String!): UserConnection!
   # users: [Users!]!
-  user(id: ID!): ResponseUsers!
+  user(screen_name: String!): ResponseUsers!
 
   user_search_filters: UserSearchFilters!
 
   verify_email(code: String!): VerifyEmails!
+
+  reset_password(token: String!): ResetPasswords!
 }
 
 # ========== input ==========
@@ -220,16 +266,17 @@ input UpdateAccounts {
   id: Int
   phone_number: String
   email: String
-  new_passwored: String
+  current_password: String
+  new_password: String
 }
 
 input UpdateUsers {
-  # id: Int!
-  display_name: String!
-  # screen_name: String!
+  id: Int
+  display_name: String
+  screen_name: String
   gender: String!
-  age: Int!
-  location: String!
+  age: Int
+  location: String
 }
 
 input UpdateUserProfiles {
@@ -237,7 +284,7 @@ input UpdateUserProfiles {
   user_id: Int
 	introduction: String
 
-	# height_id: Int
+	height: Int
 	body_type_id: Int
 	blood_type_id: Int
 	residence_country_id: Int
@@ -275,6 +322,8 @@ input UpdateUserProfiles {
 
 input NewVerifyEmails {
   email: String!
+  token: String!
+  pin_code: String!
 }
 
 # ========== mutation ==========
@@ -284,12 +333,17 @@ type Mutation {
   createBlock(input: NewBlocks): Blocks!
   createLike(input: NewLikes): Likes!
   createReport(input: NewReports): Reports!
-  login(input: NewLogin): Users!
+  login(email: String!, password: String!): Users!
   createUser(input: NewUsers): Users!
   createUserSearchFilters(input: NewUserSearchFilters): UserSearchFilters!
   updateUserSearchFilters(input: UpdateUserSearchFilters): UserSearchFilters!
   updateAccount(input: UpdateAccounts): Accounts!
   updateUser(input: UpdateUsers): Users!
   updateUserProfile(input: UpdateUserProfiles): UserProfiles!
-  createVerifyEmail(input: NewVerifyEmails): VerifyEmails!
+  createVerifyEmail(email: String!): VerifyEmails!
+
+  createResetPassword(email: String!): ResetPasswords!
+  updateResetPassword(reset_key: String!, password: String!): Users!
+
+  createTweet(text: String!): Tweets!
 }

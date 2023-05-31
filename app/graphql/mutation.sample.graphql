@@ -1,0 +1,89 @@
+mutation Signup($email: Strign!, $account: NewAccounts) {
+	createAccount(email: $email, account: $account) {
+		user {
+			screen_name
+			display_name
+			age
+		}
+	}
+}
+
+mutation Login($email: String!, $password: String!) {
+	login(email: $email, password: $password) {
+		me {
+			screen_name
+			display_name
+			age
+		}
+	}
+}
+
+mutation UpdateAccount($account: UpdateAccounts) {
+	updateAccount(account: $account) {
+		user {
+			display_name
+			screen_name
+			age
+		}
+	}
+}
+
+mutation UpdateUser($user: UpdateUsers) {
+	updateUser(user: $user) {
+		display_name
+		screen_name
+		age
+	}
+}
+
+mutation UpdateUserSearchFilter($filter: UpdateUserSearchFilters) {
+	updateUserSearchFilters(filter: $filter) {
+		...
+	}
+}
+
+mutation NewVerifyEmails($email: NewVerifyEmails) {
+	createVerifyEmail(email: $email) {
+		email
+		token
+		pin_code
+	}
+}
+
+# ブロック機能
+mutation NewBlocks($blocked_id: Int!) {
+	createBlock(blocked_id: $blocked_id) {
+		id
+		blocking_id
+		blocked_id
+	}
+}
+
+mutation DeleteBlocks($id: ID!) {
+	deleteBlock(id: $id) {
+
+	}
+}
+
+# 通報機能
+mutation NewReports($reported_id: Int!) {
+	createReport(reported_id: $reported_id) {
+		id
+		reported_id
+		reason
+	}
+}
+
+# 他ユーザーへのいいね機能
+mutation NewUserLikes($receiver_id: Int!) {
+	createLike(receiver_id: $receiver_id) {
+		
+	}
+}
+
+# 呟きへのいいね機能
+mutation NewTweets($tweet_id: Int!) {
+	createTweetLike(tweet_id: $tweet_id) {
+		
+	}
+}

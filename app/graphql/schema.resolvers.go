@@ -8,10 +8,12 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/takeuchi-shogo/k8s-go-sample/domain/models"
 	"github.com/takeuchi-shogo/k8s-go-sample/graphql/types"
 	"github.com/takeuchi-shogo/k8s-go-sample/interface/controllers"
+	"github.com/takeuchi-shogo/k8s-go-sample/interface/gateways/repositories"
 )
 
 // LoginStatus is the resolver for the login_status field.
@@ -32,6 +34,11 @@ func (r *blocksResolver) Blocking(ctx context.Context, obj *models.Blocks) (int,
 // Blocked is the resolver for the blocked field.
 func (r *blocksResolver) Blocked(ctx context.Context, obj *models.Blocks) (int, error) {
 	panic(fmt.Errorf("not implemented: Blocked - blocked"))
+}
+
+// BlockedUser is the resolver for the blocked_user field.
+func (r *blocksResolver) BlockedUser(ctx context.Context, obj *models.Blocks) (*models.Users, error) {
+	panic(fmt.Errorf("not implemented: BlockedUser - blocked_user"))
 }
 
 // CreateAccount is the resolver for the createAccount field.
@@ -80,9 +87,9 @@ func (r *mutationResolver) CreateReport(ctx context.Context, input *types.NewRep
 }
 
 // Login is the resolver for the login field.
-func (r *mutationResolver) Login(ctx context.Context, input *types.NewLogin) (*models.Users, error) {
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*models.Users, error) {
 	authorizeGraphqlController := controllers.NewAuthorizeGraphqlController(r.DB, r.Jwt)
-	return &models.Users{}, authorizeGraphqlController.Login(ctx, input.Email, input.Password)
+	return authorizeGraphqlController.Login(ctx, email, password)
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -132,18 +139,18 @@ func (r *mutationResolver) UpdateAccount(ctx context.Context, input *types.Updat
 
 // UpdateUser is the resolver for the updateUser field.
 func (r *mutationResolver) UpdateUser(ctx context.Context, input *types.UpdateUsers) (*models.Users, error) {
-	user := &models.Users{
-		// ID:          input.ID,
-		DisplayName: input.DisplayName,
-		// ScreenName:  input.ScreenName,
-		Gender:   input.Gender,
-		Age:      input.Age,
-		Location: input.Location,
-	}
+	// user := &models.Users{
+	// 	// ID:          input.ID,
+	// 	DisplayName: input.DisplayName,
+	// 	// ScreenName:  input.ScreenName,
+	// 	Gender:   input.Gender,
+	// 	Age:      input.Age,
+	// 	Location: input.Location,
+	// }
 
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
-	return usersGraphqlController.Patch(ctx, user)
+	return usersGraphqlController.Patch(ctx, input)
 }
 
 // UpdateUserProfile is the resolver for the updateUserProfile field.
@@ -153,10 +160,28 @@ func (r *mutationResolver) UpdateUserProfile(ctx context.Context, input *types.U
 }
 
 // CreateVerifyEmail is the resolver for the createVerifyEmail field.
-func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, input *types.NewVerifyEmails) (*models.VerifyEmails, error) {
+func (r *mutationResolver) CreateVerifyEmail(ctx context.Context, email string) (*models.VerifyEmails, error) {
 	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
 
-	return verifyEmailsGraphqlController.Post(ctx, input.Email)
+	return verifyEmailsGraphqlController.Post(ctx, email)
+}
+
+// CreateResetPassword is the resolver for the createResetPassword field.
+func (r *mutationResolver) CreateResetPassword(ctx context.Context, email string) (*models.ResetPasswords, error) {
+	resetPasswordsGraphqlController := controllers.NewResetPasswordsGraphqlController(r.DB)
+	return resetPasswordsGraphqlController.Create(ctx, email)
+}
+
+// UpdateResetPassword is the resolver for the updateResetPassword field.
+func (r *mutationResolver) UpdateResetPassword(ctx context.Context, resetKey string, password string) (*models.Users, error) {
+	resetPasswordsGraphqlController := controllers.NewResetPasswordsGraphqlController(r.DB)
+	return resetPasswordsGraphqlController.Save(ctx, resetKey, password)
+}
+
+// CreateTweet is the resolver for the createTweet field.
+func (r *mutationResolver) CreateTweet(ctx context.Context, text string) (*models.Tweets, error) {
+	tgc := controllers.NewTweetsGraphqlController(r.DB, r.Jwt)
+	return tgc.Create(ctx, text)
 }
 
 // Account is the resolver for the account field.
@@ -195,6 +220,39 @@ func (r *queryResolver) Report(ctx context.Context, id string) (*models.Reports,
 	panic(fmt.Errorf("not implemented: Report - report"))
 }
 
+// Home is the resolver for the home field.
+func (r *queryResolver) Home(ctx context.Context, first int, after string) (*types.HomeTimeLine, error) {
+	db := r.DB.Connect()
+	tr := repositories.TweetRepository{}
+
+	t, _ := tr.FindByCursor(db, first, after)
+	return &types.HomeTimeLine{
+		Tweets: t,
+		Metadata: &types.Metadata{
+			TotalTweetsCount: len(t),
+			PageInfo:         &types.PageInfo{},
+		},
+	}, nil
+}
+
+// Tweets is the resolver for the tweets field.
+func (r *queryResolver) Tweets(ctx context.Context, userID int) (*types.TweetConnection, error) {
+	tweetGraphqlController := controllers.NewTweetsGraphqlController(r.DB, r.Jwt)
+	return tweetGraphqlController.GetList(ctx, userID)
+}
+
+// Tweet is the resolver for the tweet field.
+func (r *queryResolver) Tweet(ctx context.Context, id string) (*models.Tweets, error) {
+	db := r.DB.Connect()
+	tr := repositories.TweetRepository{}
+
+	idInt, _ := strconv.Atoi(id)
+
+	t, _ := tr.TakeByID(db, idInt)
+
+	return t, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context, first int, after string) (*types.UserConnection, error) {
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
@@ -202,11 +260,11 @@ func (r *queryResolver) Users(ctx context.Context, first int, after string) (*ty
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, id string) (*models.ResponseUsers, error) {
-	ids, _ := strconv.Atoi(id)
+func (r *queryResolver) User(ctx context.Context, screenName string) (*models.ResponseUsers, error) {
+	// ids, _ := strconv.Atoi(id)
 	usersGraphqlController := controllers.NewUsersGraphqlController(r.DB, r.Jwt)
 
-	return usersGraphqlController.Get(ctx, ids)
+	return usersGraphqlController.Get(ctx, screenName)
 }
 
 // UserSearchFilters is the resolver for the user_search_filters field.
@@ -221,6 +279,47 @@ func (r *queryResolver) VerifyEmail(ctx context.Context, code string) (*models.V
 	verifyEmailsGraphqlController := controllers.NewVerifyEmailsGraphqlController(r.DB)
 
 	return verifyEmailsGraphqlController.Get(ctx, code)
+}
+
+// ResetPassword is the resolver for the reset_password field.
+func (r *queryResolver) ResetPassword(ctx context.Context, token string) (*models.ResetPasswords, error) {
+	resetPasswordsGraphqlController := controllers.NewResetPasswordsGraphqlController(r.DB)
+	return resetPasswordsGraphqlController.Get(ctx, token)
+}
+
+// FormatCreatedAt is the resolver for the format_created_at field.
+func (r *tweetsResolver) FormatCreatedAt(ctx context.Context, obj *models.Tweets) (string, error) {
+	tz, _ := time.LoadLocation("Asia/Tokyo")
+	return time.Unix(obj.CreatedAt, 0).In(tz).Format("2006.01.02 15:04:05"), nil
+}
+
+// IsLiked is the resolver for the is_liked field.
+func (r *tweetsResolver) IsLiked(ctx context.Context, obj *models.Tweets) (bool, error) {
+	panic(fmt.Errorf("not implemented: IsLiked - is_liked"))
+}
+
+// LikeCnt is the resolver for the like_cnt field.
+func (r *tweetsResolver) LikeCnt(ctx context.Context, obj *models.Tweets) (int, error) {
+	return 0, nil
+}
+
+// CommentCnt is the resolver for the comment_cnt field.
+func (r *tweetsResolver) CommentCnt(ctx context.Context, obj *models.Tweets) (int, error) {
+	return 0, nil
+}
+
+// User is the resolver for the user field.
+func (r *tweetsResolver) User(ctx context.Context, obj *models.Tweets) (*models.Users, error) {
+	db := r.DB.Connect()
+	ur := repositories.UserRepository{}
+
+	user, _ := ur.FindByID(db, obj.UserID)
+	return user, nil
+}
+
+// HeightID is the resolver for the height_id field.
+func (r *userProfilesResolver) HeightID(ctx context.Context, obj *models.UserProfiles) (int, error) {
+	panic(fmt.Errorf("not implemented: HeightID - height_id"))
 }
 
 // ResidenceID is the resolver for the residence_id field.
@@ -260,6 +359,9 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Tweets returns TweetsResolver implementation.
+func (r *Resolver) Tweets() TweetsResolver { return &tweetsResolver{r} }
+
 // UserProfiles returns UserProfilesResolver implementation.
 func (r *Resolver) UserProfiles() UserProfilesResolver { return &userProfilesResolver{r} }
 
@@ -270,6 +372,7 @@ type accountsResolver struct{ *Resolver }
 type blocksResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type tweetsResolver struct{ *Resolver }
 type userProfilesResolver struct{ *Resolver }
 type usersResolver struct{ *Resolver }
 
@@ -279,6 +382,9 @@ type usersResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *tweetsResolver) CreatedAt(ctx context.Context, obj *models.Tweets) (int, error) {
+	panic(fmt.Errorf("not implemented: CreatedAt - created_at"))
+}
 func (r *likesResolver) SendUserID(ctx context.Context, obj *models.Likes) (int, error) {
 	panic(fmt.Errorf("not implemented: SendUserID - send_user_id"))
 }

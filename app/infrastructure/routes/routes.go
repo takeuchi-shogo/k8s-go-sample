@@ -10,7 +10,6 @@ import (
 	"github.com/takeuchi-shogo/k8s-go-sample/graphql"
 	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/database"
 	"github.com/takeuchi-shogo/k8s-go-sample/infrastructure/middleware"
-	"github.com/takeuchi-shogo/k8s-go-sample/interface/controllers"
 )
 
 type Routes struct {
@@ -39,11 +38,11 @@ func (r *Routes) setCors(cors *middleware.Cors) {
 
 func (r *Routes) setRouting() {
 
-	accountsController := controllers.NewAccountsController(controllers.AccountsControllerProvider{DB: r.DB, Jwt: r.Jwt})
-	blocksController := controllers.NewBlocksController(controllers.BlocksControllerProvider{DB: r.DB, Jwt: r.Jwt})
-	reportsController := controllers.NewReportsController(controllers.ReportsControllerProvider{DB: r.DB, Jwt: r.Jwt})
-	userProfilesController := controllers.NewUserProfilesController(controllers.UserProfilesControllerProvider{DB: r.DB, Jwt: r.Jwt})
-	usersController := controllers.NewUsersController(controllers.UsersControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	// accountsController := controllers.NewAccountsController(controllers.AccountsControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	// blocksController := controllers.NewBlocksController(controllers.BlocksControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	// reportsController := controllers.NewReportsController(controllers.ReportsControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	// userProfilesController := controllers.NewUserProfilesController(controllers.UserProfilesControllerProvider{DB: r.DB, Jwt: r.Jwt})
+	// usersController := controllers.NewUsersController(controllers.UsersControllerProvider{DB: r.DB, Jwt: r.Jwt})
 
 	// srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 
@@ -59,27 +58,27 @@ func (r *Routes) setRouting() {
 	})
 
 	// REST API用
-	v1 := r.Gin.Group("/v1")
+	// v1 := r.Gin.Group("/v1")
 
-	// accounts
-	v1.GET("/accounts", func(ctx *gin.Context) { accountsController.Get(ctx) })
-	v1.POST("/accounts", func(ctx *gin.Context) { accountsController.Post(ctx) })
+	// // accounts
+	// v1.GET("/accounts", func(ctx *gin.Context) { accountsController.Get(ctx) })
+	// v1.POST("/accounts", func(ctx *gin.Context) { accountsController.Post(ctx) })
 
-	// blocks
-	v1.GET("/blocks/:id", func(ctx *gin.Context) { blocksController.Get(ctx) })
-	v1.POST("/blocks", func(ctx *gin.Context) { blocksController.Post(ctx) })
+	// // blocks
+	// v1.GET("/blocks/:id", func(ctx *gin.Context) { blocksController.Get(ctx) })
+	// v1.POST("/blocks", func(ctx *gin.Context) { blocksController.Post(ctx) })
 
-	// reports
-	v1.GET("/reports/:id", func(ctx *gin.Context) { reportsController.Get(ctx) })
-	v1.POST("/reports", func(ctx *gin.Context) { reportsController.Post(ctx) })
+	// // reports
+	// v1.GET("/reports/:id", func(ctx *gin.Context) { reportsController.Get(ctx) })
+	// v1.POST("/reports", func(ctx *gin.Context) { reportsController.Post(ctx) })
 
-	// userProfiles
-	v1.GET("/userProfiles/:id", func(ctx *gin.Context) { userProfilesController.Get(ctx) })
-	v1.POST("/userProfiles", func(ctx *gin.Context) { userProfilesController.Post(ctx) })
+	// // userProfiles
+	// v1.GET("/userProfiles/:id", func(ctx *gin.Context) { userProfilesController.Get(ctx) })
+	// v1.POST("/userProfiles", func(ctx *gin.Context) { userProfilesController.Post(ctx) })
 
-	// users
-	v1.POST("/users", func(ctx *gin.Context) { usersController.Post(ctx) })
-	v1.GET("/users/:id", func(ctx *gin.Context) { usersController.Get(ctx) })
+	// // users
+	// v1.POST("/users", func(ctx *gin.Context) { usersController.Post(ctx) })
+	// v1.GET("/users/:id", func(ctx *gin.Context) { usersController.Get(ctx) })
 }
 
 // Defining the Graphql handler

@@ -158,7 +158,10 @@ func (interactor *AccountInteractor) Save(userID int, a *types.UpdateAccounts) (
 		email := *a.Email
 		foundAccount.Email = email
 	}
-	foundAccount.Password, err = generatePassword(foundAccount.Password, a.NewPasswored)
+	foundAccount.Password, err = generatePassword(foundAccount.Password, a.CurrentPassword, a.NewPassword)
+	if err != nil {
+		return &models.Accounts{}, services.NewResultStatus(http.StatusBadRequest, err)
+	}
 
 	account, err := interactor.AccountRepository.Save(db, foundAccount)
 	if err != nil {
@@ -167,19 +170,25 @@ func (interactor *AccountInteractor) Save(userID int, a *types.UpdateAccounts) (
 	return account, services.NewResultStatus(http.StatusOK, nil)
 }
 
-func generatePassword(currentPassword string, newPassword *string) (string, error) {
+func generatePassword(oldPassword string, currentPassword, newPassword *string) (string, error) {
 	// NULL or undefind、nilの確認
-	if newPassword != nil {
-		if *newPassword != "" {
-			pass := *newPassword
-			if err := utils.CheckPassword(pass, currentPassword); err != nil {
+	if currentPassword != nil {
+		if *currentPassword != "" {
+			pass := *currentPassword
+			if err := utils.CheckPassword(pass, oldPassword); err != nil {
 				return "", err
 			}
-			return utils.GenerateFromPassword(*newPassword)
+			if newPassword != nil {
+				if *newPassword != "" {
+					return utils.GenerateFromPassword(*newPassword)
+				} else {
+					return "", errors.New("新しいパスワードを入力してください")
+				}
+			}
 		} else {
-			return "", errors.New("新しいパスワードを入力してください")
+			return "", errors.New("現在のパスワードを入力してください")
 		}
 	}
 
-	return currentPassword, nil
+	return oldPassword, nil
 }

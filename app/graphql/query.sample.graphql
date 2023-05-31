@@ -1,0 +1,184 @@
+# アカウントデータ取得時
+query {
+	account {
+		phone_number
+		email
+		password
+		access_level
+	}
+}
+
+# ユーザーリストに必要なデータ
+query {
+	users {
+		screen_name
+		display_name
+		age
+		location
+		# tweet {
+		# 	text
+		# }
+	}
+}
+
+# ユーザー詳細ページに必要なデータ
+# screen_nameで判断する
+query {
+	user(screenName: $screen_name) {
+		screen_name
+		display_name
+		age
+		is_liked
+		# tweet {
+		# 	text
+		# }
+		user_profile {
+			introduction
+			height
+			body_type
+			blood_type
+			...
+		}
+	}
+}
+
+# 呟きのリストを取得する
+# ここからがN＋1問題に直面しそう
+query {
+	tweets {
+		id
+		text
+		created_at
+		user {
+			screen_name
+			display_name
+			age
+		}
+		like_cnt
+		comment_cnt
+	}
+}
+
+query {
+	tweet(id: $id) {
+		id
+		text
+		created_at
+		user {
+			screen_name
+			display_name
+			age
+		}
+		like_cnt
+		comments {
+			id
+			text
+			created_at
+			user {
+				screen_name
+				display_name
+			}
+		}
+	}
+}
+
+# ブロック機能
+query {
+	blocks {
+		id
+		blocked_id
+		user {
+			screen_name
+			display_name
+		}
+	}
+}
+
+# 通報機能
+# ここは履歴としてリストを返すが迷う（実装しているものは見たことない）
+query {
+	reports {
+		id
+	}
+}
+
+# ホーム画面取得（Twitter模写）
+query {
+	home {
+		home_time_line {
+			instructions {
+				entries {
+					entry_id
+					content {
+						client_event_info {}
+						display_type
+						entry_type
+						item {
+							client_event_info
+							item_content {
+								item_type
+								tweet_results {
+									# 中身のデータ
+								}
+							}
+						}
+						metadata {}
+					}
+					sort_index
+				}
+			}
+			metadata {}
+		}
+	}
+}
+
+# アプリの使用に落とし込んだクエリ
+query {
+	home {
+		home_time_line {
+			tweets {
+				id
+				text
+				user_info: user {
+					screen_name
+					display_name
+					age
+				}
+			}
+			metadat {
+				total_tweets_count
+				page_info {
+					has_next_page
+					has_previous_page
+					start_cursor
+					end_cursor
+				}
+			}
+		}
+	}
+}
+
+# Tweet ページに必要なもの
+query tweet {
+	tweet {
+		id
+		text
+		format_created_at
+		user_info: user {
+			screen_name
+			display_name
+			age
+		}
+		comments {
+			id
+			text
+			format_created_at
+			like_cnt
+			comment_cnt
+			user {
+				screen_name
+				display_name
+			}
+		}
+	}
+}
